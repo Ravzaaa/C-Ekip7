@@ -1,0 +1,10 @@
+^C:\USERS\PCASUS\DESKTOP\PROJE\PROJE_ODEVI\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/PCASUS/Desktop/proje/proje_odevi -BC:/Users/PCASUS/Desktop/proje/proje_odevi/build --check-stamp-file C:/Users/PCASUS/Desktop/proje/proje_odevi/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
