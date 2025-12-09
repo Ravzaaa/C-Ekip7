@@ -5,4 +5,12 @@ project(OdevProjesi VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(OdevProjesi main.cpp)
+# include klasörünü tanıttık
+include_directories(include)
+
+# DERLENECEK TÜM KAYNAK DOSYALARI
+add_executable(OdevProjesi
+    main.cpp
+    src/Device.cpp
+    src/Light.cpp
+)

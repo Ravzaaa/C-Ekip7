@@ -1,6 +1,6 @@
-^C:\USERS\PCASUS\DESKTOP\PROJE\PROJE_ODEVI\CMAKELISTS.TXT
+^C:\USERS\NUREFŞAN\DESKTOP\MSH_PROJECT\C-EKIP7\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/PCASUS/Desktop/proje/proje_odevi -BC:/Users/PCASUS/Desktop/proje/proje_odevi/build --check-stamp-file C:/Users/PCASUS/Desktop/proje/proje_odevi/build/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7 -BC:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7/build --check-stamp-file C:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

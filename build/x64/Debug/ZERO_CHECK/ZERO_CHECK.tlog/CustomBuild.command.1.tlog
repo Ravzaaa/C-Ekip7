@@ -1,6 +1,6 @@
-^C:\USERS\PCASUS\DESKTOP\PROJE\PROJE_ODEVI\BUILD\CMAKEFILES\EEC37DBCE84474A02926040C0A1C5604\GENERATE.STAMP.RULE
+^C:\USERS\NUREFŞAN\DESKTOP\MSH_PROJECT\C-EKIP7\BUILD\CMAKEFILES\89FB494305FE4C494844BCCA31741DC4\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/PCASUS/Desktop/proje/proje_odevi -BC:/Users/PCASUS/Desktop/proje/proje_odevi/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/PCASUS/Desktop/proje/proje_odevi/build/OdevProjesi.sln
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7 -BC:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/NUREFŞAN/Desktop/MSH_Project/C-Ekip7/build/OdevProjesi.sln
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
