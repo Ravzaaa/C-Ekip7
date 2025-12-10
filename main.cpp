@@ -1,5 +1,8 @@
 #include <iostream>
 #include "Light.h"
+#include "Camera.h"
+#include "TV.h"
+
 
 int main() {
     std::cout << "Akilli Ev Sistemi Baslatiliyor...\n";
@@ -18,6 +21,27 @@ int main() {
 
     // Tekrar durumu yazdir
     salonIsigi.reportStatus();
+
+    // Camera nesnesi olustur
+    Camera guvenlikKamerasi("Guvenlik Kamerasi");
+
+    guvenlikKamerasi.powerOn();
+    guvenlikKamerasi.startRecording();
+    guvenlikKamerasi.reportStatus();
+
+    guvenlikKamerasi.stopRecording();
+    guvenlikKamerasi.powerOff();
+    guvenlikKamerasi.reportStatus();
+
+    TV salonTV("Salon TV", 7, 25);
+
+    salonTV.powerOn();
+    salonTV.setChannel(12);
+    salonTV.setVolume(40);
+    salonTV.reportStatus();
+    salonTV.powerOff();
+    salonTV.reportStatus();
+
 
     return 0;
 }

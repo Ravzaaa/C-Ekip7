@@ -13,4 +13,7 @@ add_executable(OdevProjesi
     main.cpp
     src/Device.cpp
     src/Light.cpp
+    src/Camera.cpp
+    src/TV.cpp
 )
+
