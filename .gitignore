@@ -1,0 +1,10 @@
+# Gereksiz Build Dosyalarý
+build/
+out/
+.vs/
+*.exe
+*.log
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
