@@ -4,6 +4,12 @@
 #include <algorithm> 
 #include <memory>    
 
+//
+//DEV1 TARAFINDAN OLUTURULAN LOG ISLEMI KULLANILACAK
+//
+//
+	
+//TEMÝZLEME ISLEMLERI YAPILACAK
 
 class Device {
 protected:
@@ -133,10 +139,151 @@ public:
 	}
 };
 
+//abstract factory icin soyut arayuz
+class DeviceFactory {
+public:
+	// factory methodlari
+	virtual Device* createLight() = 0;
+	virtual Device* createCamera() = 0;
+	virtual Device* createDetector() = 0; 
+	virtual Device* createTV() = 0;
+	virtual ~DeviceFactory() {}
+};
 
+class StandardDeviceFactory : public DeviceFactory {
+public:
+	Device* createLight() override { return new Light(); }
+	Device* createCamera() override { return new Camera(); }
+	Device* createDetector() override { return new Detector(); }
+	Device* createTV() override { return new TV(); }
+};
+
+
+//yonetici sinif
+class DeviceManager {
+private:
+	std::vector<Device*> deviceList; // dinamik liste olusturma
+	DeviceFactory* factory;
+
+public:
+	DeviceManager() {
+		factory = new StandardDeviceFactory();
+	}
+
+	~DeviceManager() {
+		// temizlik
+		for (Device* d : deviceList) delete d;
+		delete factory;
+	}
+
+	// istenilen cihaz bilgileri sorgusu
+	void uiAddDevice() {
+		int choice, quantity;
+		std::cout << "\n--- Cihaz Ekle ---\n";
+		std::cout << "1. Light\n2. Camera\n3. Detector (Smoke & Gas)\n4. TV\nSecim: ";
+		std::cin >> choice;
+		std::cout << "Adet: ";
+		std::cin >> quantity;
+
+		Device* prototype = nullptr;
+
+		//ilk cihazin factory ile olusturulmasi
+		switch (choice) {
+		case 1: prototype = factory->createLight(); break;
+		case 2: prototype = factory->createCamera(); break;
+		case 3: prototype = factory->createDetector(); break;
+		case 4: prototype = factory->createTV(); break;
+		default: std::cout << "Gecersiz secim.\n"; return;
+		}
+
+		if (!prototype) return;
+
+		
+		addDevice(prototype);
+
+		// prototype pattern ile çoðaltma islemi
+		for (int i = 1; i < quantity; ++i) {
+			addDevice(prototype->clone());
+		}
+
+		std::cout << quantity << " adet cihaz eklendi.\n";
+	}
+
+	// cihazlarin listeye eklenmesi
+	void addDevice(Device* d) {
+		deviceList.push_back(d);
+		//
+		// LOGLAMA ÝSLEMÝ YAPÝLACAK
+		//Logger::getInstance()->log("Cihaz eklendi: " + d->getName() + " ID:" + std::to_string(d->getId()));
+		//	
+		
+	}
+	void listDevices() {
+		std::cout << "\n--- Cihaz Listesi ---\n";
+		for (const auto& d : deviceList) {
+			d->reportStatus();
+		}
+		std::cout << "---------------------\n";
+	}
+
+	std::vector<Device*>& getDevices() {
+		return deviceList;
+	}
+
+	// istenilen cihazlarin kaldirilmasi
+	void uiRemoveDevice() {
+		listDevices(); 
+		if (deviceList.empty()) return;
+
+		int idToRemove;
+		std::cout << "Silinecek Cihaz ID: ";
+		std::cin >> idToRemove;
+
+		removeDevice(idToRemove);
+	}
+
+	void removeDevice(int id) {
+		auto it = std::remove_if(deviceList.begin(), deviceList.end(),
+			[id](Device* d) {
+				if (d->getId() == id) {
+					//
+					// LOGLAMA ISLEMI YAPILACAK
+					// 
+					//Logger::getInstance()->log("Cihaz silindi ID:" + std::to_string(id));
+					delete d;
+					return true;
+				}
+				return false;
+			});
+
+		if (it != deviceList.end()) {
+			deviceList.erase(it, deviceList.end());
+			std::cout << "Cihaz basariyla silindi.\n";
+		}
+		else {
+			std::cout << "Cihaz bulunamadi.\n";
+		}
+	} 
+
+};
 
 int main() {
-	
+	DeviceManager manager;
 
+	//cihaz ekleme islemi
+	manager.uiAddDevice();
+
+	// cihazlari listeleme
+	manager.listDevices();
+
+	// cihaz kaldirma islemi
+	manager.uiRemoveDevice();
+
+	manager.listDevices();
+
+	std::cout << "\nTest tamamlandi. Cikmak icin Enter'a basin...";
+
+	std::cin.ignore();
+	std::cin.get();
 	return 0;
 }
