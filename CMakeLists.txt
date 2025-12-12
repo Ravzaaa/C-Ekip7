@@ -11,4 +11,5 @@ include_directories(include)
 add_executable(OdevProjesi 
     main.cpp 
     src/Device.cpp
+    src/Logger.cpp
 )

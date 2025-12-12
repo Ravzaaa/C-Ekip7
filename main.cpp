@@ -3,14 +3,10 @@
 #include <string>
 #include <algorithm> 
 #include <memory>    
+#include <cstdlib> // system("cls") komutu için gerekli
+#include "Logger.h"
 
-//
-//DEV1 TARAFINDAN OLUTURULAN LOG ISLEMI KULLANILACAK
-//
-//
 	
-//TEMÝZLEME ISLEMLERI YAPILACAK
-
 class Device {
 protected:
 	static int idCounter; // ID numarasýný artýrmak için
@@ -218,8 +214,12 @@ public:
 		delete factory;
 	}
 
+	void clearScreen() {
+		system("cls");
+	}
 	// istenilen cihaz bilgileri sorgusu
 	void uiAddDevice() {
+		clearScreen();
 		int choice, quantity;
 		std::cout << "\n--- Cihaz Ekle ---\n";
 		std::cout << "1. Light\n2. Camera\n3. Detector (Smoke & Gas)\n4. TV\n5. Alarm\nSecim: ";
@@ -259,6 +259,9 @@ public:
 		// LOGLAMA ÝSLEMÝ YAPÝLACAK
 		//Logger::getInstance()->log("Cihaz eklendi: " + d->getName() + " ID:" + std::to_string(d->getId()));
 		//	
+		if (Logger::getInstance()) {
+			Logger::getInstance()->log("Cihaz eklendi: " + d->getName() + " ID:" + std::to_string(d->getId()));
+		}
 		
 	}
 	void listDevices() {
@@ -275,6 +278,7 @@ public:
 
 	// istenilen cihazlarin kaldirilmasi
 	void uiRemoveDevice() {
+		clearScreen();
 		listDevices(); 
 		if (deviceList.empty()) return;
 
@@ -293,12 +297,16 @@ public:
 					// LOGLAMA ISLEMI YAPILACAK
 					// 
 					//Logger::getInstance()->log("Cihaz silindi ID:" + std::to_string(id));
+					if (Logger::getInstance()) {
+						Logger::getInstance()->log("Cihaz silindi ID:" + std::to_string(id));
+					}
 					delete d;
 					return true;
 				}
 				return false;
 			});
 
+		clearScreen();
 		if (it != deviceList.end()) {
 			deviceList.erase(it, deviceList.end());
 			std::cout << "Cihaz basariyla silindi.\n";
@@ -306,6 +314,7 @@ public:
 		else {
 			std::cout << "Cihaz bulunamadi.\n";
 		}
+		
 	} 
 
 };
