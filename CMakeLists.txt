@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Proje Adı
-project(MSH_Project)
+project(OdevProjesi)
 
 # C++ Sürümü
 set(CMAKE_CXX_STANDARD 17)
@@ -11,7 +11,4 @@ include_directories(include)
 
 # Programı oluşturacak dosyaları tek tek yazıyoruz.
 # Dosyalar 'src' klasöründe olduğu için başına 'src/' ekliyoruz.
-add_executable(MSH_Project 
-    src/main.cpp 
-    src/MSH.cpp
-)
+add_executable(OdevProjesi main.cpp src/MSH.cpp)
