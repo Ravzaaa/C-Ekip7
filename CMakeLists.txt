@@ -1,8 +1,16 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.0)
+project(MSH_Project CXX)
 
-project(OdevProjesi VERSION 1.0)
+set(CMAKE_CXX_STANDARD 98) 
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# BÜTÜN KAYNAK DOSYALARINI LİSTELE
+set(SOURCE_FILES
+    src/main.cpp
+    src/Logger.cpp
+    src/DataManager.cpp
+)
 
-add_executable(OdevProjesi main.cpp)
+add_executable(msh_app ${SOURCE_FILES})
+
+# BAŞLIK (HEADER) YOLLARINI GÖSTER
+target_include_directories(msh_app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
