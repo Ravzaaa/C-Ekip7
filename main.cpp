@@ -1,47 +1,48 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <thread> // Timer simulasyonu icin
-#include <chrono> // Timer simulasyonu icin
+#include <thread> // Timer simulasyonu (std::this_thread)
+#include <chrono> // Zaman birimleri (std::chrono)
 
 using namespace std;
 
-// ==========================================
-// 1. PATTERN: OBSERVER PATTERN (Gozlemci)
-// ==========================================
-// Amac: LLR 6.1 ve 6.2'yi saglamak. Sensorler (Subject) bir durum algiladiginda
-// ilgili birimlere (Logger, Alarm, SMS) haber verir.
+// =============================================================
+//  BOLUM 1: OBSERVER PATTERN (Gozlemci - LLR 6.1, 6.2)
+// =============================================================
 
-// --- Observer Interface (UML: Observer) ---
+// --- 1.1 Observer Interface ---
 class Observer {
 public:
     virtual void update(string event) = 0;
     virtual ~Observer() = default;
 };
 
-// --- Concrete Observers (UML: LoggerObserver, AlarmObserver, SMSObserver) ---
+// --- 1.2 Concrete Observers ---
 class LoggerObserver : public Observer {
 public:
     void update(string event) override {
-        cout << "[LOGGER]: Sistem kaydina eklendi: " << event << endl;
+        // LLR 6.2: Log mesajı bildirimi
+        cout << "[LOGGER]: Sistem kaydina islendi -> " << event << endl;
     }
 };
 
 class AlarmObserver : public Observer {
 public:
     void update(string event) override {
-        cout << "[ALARM UNIT]: Uyari alindi! Sistem tetikleniyor: " << event << endl;
+        // LLR 6.2: Alarm bildirimi
+        cout << "[ALARM UNIT]: Sensor tetiklendi! Alarm calisiyor -> " << event << endl;
     }
 };
 
 class SMSObserver : public Observer {
 public:
     void update(string event) override {
-        cout << "[SMS SERVICE]: Kullaniciya mesaj gonderildi: " << event << endl;
+        // LLR 6.2: SMS bildirimi
+        cout << "[SMS SERVICE]: Kullaniciya uyari mesaji gonderildi -> " << event << endl;
     }
 };
 
-// --- Subject Interface/Base Class (UML: Subject) ---
+// --- 1.3 Subject Base Class ---
 class Subject {
 private:
     vector<Observer*> observers;
@@ -49,26 +50,22 @@ public:
     void attach(Observer* o) {
         observers.push_back(o);
     }
-
-    void detach(Observer* o) {
-        // Basitlesirme icin detach implementasyonu opsiyonel birakildi
-    }
-
     void notify(string event) {
-        cout << "\n--- SENSOR TETIKLENDI: " << event << " ---" << endl;
+        cout << "\n--- [SENSOR] Durum Algilandi: " << event << " ---" << endl;
         for (Observer* o : observers) {
-            o->update(event); // Tum gozlemcilere haber ver
+            o->update(event);
         }
-        cout << "--------------------------------------" << endl;
+        cout << "------------------------------------------------" << endl;
     }
     virtual ~Subject() = default;
 };
 
-// --- Concrete Subjects (UML: Camera, Detector) ---
+// --- 1.4 Concrete Subjects (Sensorler) ---
+// LLR 6.1: Kamera ve Dedektörler
 class Camera : public Subject {
 public:
     void detectMotion() {
-        // LLR 6.3: Kamera hareket algilarsa
+        // LLR 6.3: Hareket algılandığında tetikle
         notify("MOTION_DETECTED");
     }
 };
@@ -76,7 +73,7 @@ public:
 class Detector : public Subject {
 public:
     void detectSmoke() {
-        // LLR 6.4: Duman algilandiginda
+        // LLR 6.4: Duman algılandığında tetikle
         notify("SMOKE_DETECTED");
     }
     void detectGas() {
@@ -84,13 +81,21 @@ public:
     }
 };
 
-// ====================================================
-// 2. PATTERN: CHAIN OF RESPONSIBILITY (Sorumluluk Zinciri)
-// ====================================================
-// Amac: LLR 6.3, 6.5, 6.6, 6.7'yi saglamak. Olayi (Event) sirasiyla
-// Alarm -> Isik -> Polis/Itfaiye seklinde islemek.
+// =============================================================
+//  BOLUM 2: CHAIN OF RESPONSIBILITY & TIMER (Zincir - LLR 6.3-6.7)
+// =============================================================
 
-// --- Handler Abstract Class (UML: Handler) ---
+// Forward Declaration (Handler sınıfını Timer'a tanıtmak için)
+class Handler;
+
+// --- 2.1 Timer Class (UML: Timer) ---
+// LLR 6.7: Senaryolar zamanlayıcı ile sıralı işler
+class Timer {
+public:
+    static void schedule(Handler* h, int interval, string event);
+};
+
+// --- 2.2 Handler Interface ---
 class Handler {
 protected:
     Handler* nextHandler = nullptr;
@@ -98,144 +103,176 @@ public:
     void setNext(Handler* h) {
         this->nextHandler = h;
     }
-
     virtual void handle(string event) = 0;
     virtual ~Handler() = default;
 };
 
-// --- Timer Class (UML: Timer) ---
-// LLR 6.7'deki sirali isletim ve zamanlamayi simule eder.
-class Timer {
-public:
-    static void schedule(Handler* h, int interval, string event) {
-        cout << "... (Zamanlayici " << interval << "ms bekliyor) ..." << endl;
+// --- Timer Implementation (Handler tanımlandıktan sonra doldurulur) ---
+void Timer::schedule(Handler* h, int interval, string event) {
+    if (h != nullptr) {
+        cout << "   ... (Zamanlayici isliyor: " << interval << "ms bekleyiniz) ..." << endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-        if (h != nullptr) {
-            h->handle(event);
-        }
+        h->handle(event);
     }
-};
+}
 
-// --- Concrete Handlers (UML: AlarmHandler, LightHandler, PoliceHandler, FireDeptHandler) ---
+// --- 2.3 Concrete Handlers ---
 
-// 1. Halka: Alarm Calmasi
+// ADIM 1: Alarm (LLR 6.3 ve 6.4)
 class AlarmHandler : public Handler {
 public:
     void handle(string event) override {
         if (event == "MOTION_DETECTED" || event == "SMOKE_DETECTED") {
-            cout << "[CHAIN - 1] AlarmHandler: Yuksek sesli alarm caliyor!" << endl;
-
-            // Siradaki isleme gec (Zamanlayici ile - LLR 6.7)
+            cout << "[ZINCIR-1] AlarmHandler: YUKSEK SESLI ALARM CALIYOR!" << endl;
+            
+            // LLR 6.7: Sıradaki adıma geç (Timer ile)
             if (nextHandler != nullptr) {
-                Timer::schedule(nextHandler, 1000, event); // 1 saniye sonra digerine gec
+                Timer::schedule(nextHandler, 1000, event); // 1 saniye sonra ışığa geç
             }
-        }
-        else {
-            // Ilgili degilse direkt pasla
-            if (nextHandler != nullptr) nextHandler->handle(event);
+        } else if (nextHandler != nullptr) {
+            nextHandler->handle(event);
         }
     }
 };
 
-// 2. Halka: Isiklarin Acilmasi / Yanip Sonmesi
+// ADIM 2: Işıklar (LLR 6.3 ve 6.5)
 class LightHandler : public Handler {
 public:
     void handle(string event) override {
         if (event == "MOTION_DETECTED") {
-            cout << "[CHAIN - 2] LightHandler: Isiklar surekli acildi." << endl;
-        }
+            // LLR 6.3: Işıkları aç
+            cout << "[ZINCIR-2] LightHandler: Tum isiklar ACILDI (Aydinlatma Saglandi)." << endl;
+        } 
         else if (event == "SMOKE_DETECTED") {
-            // LLR 6.5: Isiklari 1 saniye aralikla acip kapat (Simulasyon)
-            cout << "[CHAIN - 2] LightHandler: Isiklar acil durum modunda yanip sonuyor (BLINK)!" << endl;
+            // LLR 6.5: Işıklar yanıp söner
+            cout << "[ZINCIR-2] LightHandler: Isiklar ACIL DURUM modunda YANIP SONUYOR!" << endl;
         }
 
-        // Siradaki isleme gec
+        // Sıradaki adıma geç
         if (nextHandler != nullptr) {
             Timer::schedule(nextHandler, 1500, event); // 1.5 saniye sonra yetkiliye haber ver
         }
     }
 };
 
-// 3. Halka: Polis (Sadece Hareket Algilanirsa)
+// ADIM 3: Polis (LLR 6.3)
 class PoliceHandler : public Handler {
 public:
     void handle(string event) override {
         if (event == "MOTION_DETECTED") {
-            // LLR 6.3 son adim: Polisi ara
-            cout << "[CHAIN - 3] PoliceHandler: 155 Polis araniyor... Guvenlik ihlali!" << endl;
-        }
-        else {
-            // Hareket degilse (ornegin yanginsa), zincirdeki bir sonrakine (Itfaiye) pasla
-            if (nextHandler != nullptr) nextHandler->handle(event);
+            cout << "[ZINCIR-3] PoliceHandler: 155 POLIS MERKEZI ARANIYOR... (Guvenlik Ihlali)" << endl;
+        } else if (nextHandler != nullptr) {
+            nextHandler->handle(event);
         }
     }
 };
 
-// 4. Halka: Itfaiye (Sadece Duman/Gaz Algilanirsa)
+// ADIM 4: İtfaiye (LLR 6.6)
 class FireDeptHandler : public Handler {
 public:
     void handle(string event) override {
         if (event == "SMOKE_DETECTED" || event == "GAS_DETECTED") {
-            // LLR 6.6: Kullanici tepki vermezse itfaiyeyi ara
-            cout << "[CHAIN - 4] FireDeptHandler: 110 Itfaiye araniyor... Yangin tehlikesi!" << endl;
+            cout << "[ZINCIR-4] FireDeptHandler: 110 ITFAIYE ARANIYOR... (Yangin Tehlikesi)" << endl;
         }
     }
 };
 
-// ==========================================
-// MAIN (TEST SENARYOSU)
-// ==========================================
-int main() {
-    // 1. Observer Kurulumu (Gozlemcileri Olustur)
-    LoggerObserver* logger = new LoggerObserver();
-    AlarmObserver* alarmObs = new AlarmObserver();
-    SMSObserver* smsObs = new SMSObserver();
+// =============================================================
+//  BOLUM 3: SECURITY MANAGER (Entegrasyon Sinifi)
+// =============================================================
+// Dev 7'nin sisteminde senin kodunu temsil eden ana sınıf budur.
 
-    // 2. Subject Kurulumu (Sensorleri Olustur ve Gozlemcileri Ekle)
+class SecurityManager {
+private:
+    Handler* alarmHandler;
+    Handler* lightHandler;
+    Handler* policeHandler;
+    Handler* fireHandler;
+
+public:
+    SecurityManager() {
+        // Zinciri Kur
+        alarmHandler = new AlarmHandler();
+        lightHandler = new LightHandler();
+        policeHandler = new PoliceHandler();
+        fireHandler = new FireDeptHandler();
+
+        // Bağlantıları Yap: Alarm -> Light -> Police -> FireDept
+        alarmHandler->setNext(lightHandler);
+        lightHandler->setNext(policeHandler);
+        policeHandler->setNext(fireHandler);
+    }
+
+    ~SecurityManager() {
+        delete alarmHandler;
+        delete lightHandler;
+        delete policeHandler;
+        delete fireHandler;
+    }
+
+    // Dışarıdan gelen olayı zincirin başına ver
+    void handleEvent(string event) {
+        if (alarmHandler) {
+            alarmHandler->handle(event);
+        }
+    }
+};
+
+// =============================================================
+//  MAIN (TEST FONKSIYONU)
+// =============================================================
+int main() {
+    cout << "========================================" << endl;
+    cout << "   MSH GUVENLIK MODULU (DEV 6) TESTI    " << endl;
+    cout << "========================================" << endl;
+
+    // 1. KURULUM
+    LoggerObserver* logger = new LoggerObserver();
+    SMSObserver* sms = new SMSObserver();
+    AlarmObserver* alarm = new AlarmObserver(); // Dedektör için
+
     Camera* camera = new Camera();
     Detector* detector = new Detector();
 
-    // Kamera'ya kimler abone? (LLR 6.1, 6.2)
+    SecurityManager* secManager = new SecurityManager();
+
+    // 2. ABONELIKLER (Observer Pattern)
     camera->attach(logger);
-    camera->attach(smsObs);
+    camera->attach(sms); // Kamerada hareket olursa SMS at
 
-    // Dedektor'e kimler abone?
     detector->attach(logger);
-    detector->attach(alarmObs); // Dedektor alarm sistemini direkt tetikler (LLR 6.4)
-    detector->attach(smsObs);
+    detector->attach(alarm); // Dedektör çalarsa Alarm Cihazı (Observer) öter
+    detector->attach(sms);
 
-    // 3. Chain of Responsibility Kurulumu (Zinciri Olustur)
-    // Siralama: Alarm -> Light -> Police -> FireDept
-    AlarmHandler* alarmH = new AlarmHandler();
-    LightHandler* lightH = new LightHandler();
-    PoliceHandler* policeH = new PoliceHandler();
-    FireDeptHandler* fireH = new FireDeptHandler();
-
-    // Zinciri bagla (setNext)
-    alarmH->setNext(lightH);
-    lightH->setNext(policeH);
-    policeH->setNext(fireH);
-
-    cout << "=== SENARYO 1: HIRSIZ (KAMERA HAREKET ALGILADI) ===" << endl;
-    // Adim 1: Sensor algilar ve Observer'lari uyarir (Log ve SMS gider)
+    // 3. SENARYO 1: HAREKET (MOTION)
+    cout << "\n\n>>> SENARYO 1 BASLIYOR: HAREKET ALGILANDI <<<" << endl;
+    // a. Sensor algılar ve Gözlemcileri uyarır
     camera->detectMotion();
+    
+    // b. Güvenlik Yöneticisi zincirleme tepkiyi başlatır (Alarm -> Işık -> Polis)
+    cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
+    secManager->handleEvent("MOTION_DETECTED");
 
-    // Adim 2: Sistem tepki zincirini baslatir (LLR 6.3: Alarm -> Isik -> Polis)
-    cout << "\n>>> Guvenlik Protokolu Baslatiliyor (Zincir) <<<" << endl;
-    alarmH->handle("MOTION_DETECTED");
+    // Karışmasın diye az bekletelim
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-    cout << "\n\n=== SENARYO 2: YANGIN (DEDEKTOR DUMAN ALGILADI) ===" << endl;
-    // Adim 1: Sensor algilar (Log, SMS ve Alarm Observer calisir)
+    // 4. SENARYO 2: YANGIN (SMOKE)
+    cout << "\n\n>>> SENARYO 2 BASLIYOR: DUMAN ALGILANDI <<<" << endl;
+    // a. Sensor algılar
     detector->detectSmoke();
 
-    // Adim 2: Sistem tepki zincirini baslatir (LLR 6.5, 6.6: Alarm -> Isik(Blink) -> Itfaiye)
-    cout << "\n>>> Yangin Protokolu Baslatiliyor (Zincir) <<<" << endl;
-    alarmH->handle("SMOKE_DETECTED");
+    // b. Zincirleme tepki (Alarm -> Yanıp Sönen Işık -> İtfaiye)
+    cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
+    secManager->handleEvent("SMOKE_DETECTED");
 
-    // Bellek temizligi
-    delete logger; delete alarmObs; delete smsObs;
+    // 5. TEMIZLIK
+    delete logger; delete sms; delete alarm;
     delete camera; delete detector;
-    delete alarmH; delete lightH; delete policeH; delete fireH;
+    delete secManager;
+
+    cout << "\n\n========================================" << endl;
+    cout << "   TEST BASARIYLA TAMAMLANDI.           " << endl;
+    cout << "========================================" << endl;
 
     return 0;
 }
