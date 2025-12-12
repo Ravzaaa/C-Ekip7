@@ -1,3 +1,0 @@
-C:/Users/PCASUS/Desktop/proje/proje_odevi/build/CMakeFiles/OdevProjesi.dir
-C:/Users/PCASUS/Desktop/proje/proje_odevi/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/PCASUS/Desktop/proje/proje_odevi/build/CMakeFiles/ZERO_CHECK.dir
