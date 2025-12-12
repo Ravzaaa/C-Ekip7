@@ -79,13 +79,18 @@ class Camera : public Device {
 private:
 	int fps;
 	bool nightVision;
+	int resolution;
+	bool isRecording;
 public:
-	Camera() : Device("Camera"), fps(30), nightVision(false) {} 
+	Camera() : Device("Camera"), fps(30), nightVision(false), resolution(1080), isRecording(false){} 
 
-	void setConfig(int f, bool nv) { fps = f; nightVision = nv; }
+	void setConfig(int f, bool nv, int res) { fps = f; nightVision = nv; resolution = res;  }
+
+	void setRecording(bool state) { isRecording = state; }
+	bool getRecording() const { return isRecording; }
 
 	void reportStatus() const override {
-		std::cout << "ID: " << id << " [Camera] FPS: " << fps << ", NightVision: " << (nightVision ? "Yes" : "No") << std::endl;
+		std::cout << "ID: " << id << " [Camera] FPS: " << fps << ", NightVision: " << (nightVision ? "Yes" : "No") << ", Resolution: " << resolution << ", Recording: " << (isRecording ? "Yes" : "No") << std::endl;
 	}
 
 	Device* clone() const override {
@@ -99,13 +104,22 @@ class TV : public Device {
 private:
 	std::string brand;
 	std::string model;
+	int volume;
+	int currentChannel;
+
 public:
-	TV() : Device("TV"), brand("Generic"), model("Standard") {} 
+	TV() : Device("TV"), brand("Generic"), model("Standard"), volume(10), currentChannel(1) {} 
 
 	void setConfig(std::string b, std::string m) { brand = b; model = m; }
+	
+	void setVolume(int v) { volume = v; }
+	int getVolume() const { return volume; }
+
+	void setChannel(int ch) { currentChannel = ch; }
+	int getChannel() const { return currentChannel; }
 
 	void reportStatus() const override {
-		std::cout << "ID: " << id << " [TV] Brand: " << brand << ", Model: " << model << std::endl;
+		std::cout << "ID: " << id << " [TV] Brand: " << brand << ", Model: " << model << ", Volume: " << volume << ", Channel: " << currentChannel << std::endl;
 	}
 
 	Device* clone() const override {
@@ -139,6 +153,32 @@ public:
 	}
 };
 
+
+class Alarm : public Device {
+private:
+	bool isTriggered;
+
+public:
+	Alarm() : Device("Alarm"), isTriggered(false) {}
+
+	void setTriggered(bool state) { isTriggered = state; }
+	bool getTriggered() const { return isTriggered; }
+
+	void activate() {
+		//dev6 kullanacak
+	}
+
+	void reportStatus() const override {
+		std::cout << "ID: " << id << " [ALARM] Status: " << (isTriggered ? "TRIGGERED!" : "Silent") << std::endl;
+	}
+
+	Device* clone() const override {
+		Alarm* copy = new Alarm(*this);
+		copy->id = ++idCounter;
+		return copy;
+	}
+};
+
 //abstract factory icin soyut arayuz
 class DeviceFactory {
 public:
@@ -147,6 +187,7 @@ public:
 	virtual Device* createCamera() = 0;
 	virtual Device* createDetector() = 0; 
 	virtual Device* createTV() = 0;
+	virtual Device* createAlarm() = 0;
 	virtual ~DeviceFactory() {}
 };
 
@@ -156,6 +197,7 @@ public:
 	Device* createCamera() override { return new Camera(); }
 	Device* createDetector() override { return new Detector(); }
 	Device* createTV() override { return new TV(); }
+	Device* createAlarm() override { return new Alarm(); }
 };
 
 
@@ -180,7 +222,7 @@ public:
 	void uiAddDevice() {
 		int choice, quantity;
 		std::cout << "\n--- Cihaz Ekle ---\n";
-		std::cout << "1. Light\n2. Camera\n3. Detector (Smoke & Gas)\n4. TV\nSecim: ";
+		std::cout << "1. Light\n2. Camera\n3. Detector (Smoke & Gas)\n4. TV\n5. Alarm\nSecim: ";
 		std::cin >> choice;
 		std::cout << "Adet: ";
 		std::cin >> quantity;
@@ -193,6 +235,7 @@ public:
 		case 2: prototype = factory->createCamera(); break;
 		case 3: prototype = factory->createDetector(); break;
 		case 4: prototype = factory->createTV(); break;
+		case 5: prototype = factory->createAlarm(); break;
 		default: std::cout << "Gecersiz secim.\n"; return;
 		}
 
