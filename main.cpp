@@ -1,31 +1,34 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <thread> // Timer simulasyonu (std::this_thread)
-#include <chrono> // Zaman birimleri (std::chrono)
+#include <thread> // Timer ve bekleme için
+#include <chrono> // Zaman birimleri için
 
-// --- DIŞ KAYNAKLAR (Diğer Geliştiriciler) ---
-#include "Logger.h"  // Dev 1 (İlayda)
-#include "Device.h"  // Dev 3 (Zehra)
+// --- DIŞ KAYNAKLAR ---
+#include "Logger.h"  // İlayda
+#include "Device.h"  // Zehra
 
 using namespace std;
 
+// --- SABITLER ---
+const string EVENT_MOTION = "MOTION_DETECTED";
+const string EVENT_SMOKE = "SMOKE_DETECTED";
+const string EVENT_GAS = "GAS_DETECTED";
+
 // =============================================================
-//  BOLUM 1: OBSERVER PATTERN (Gozlemci - LLR 6.1, 6.2)
+//  BOLUM 1: OBSERVER PATTERN (Gözlemci)
 // =============================================================
 
-// --- 1.1 Observer Interface ---
 class Observer {
 public:
     virtual void update(string event) = 0;
     virtual ~Observer() = default;
 };
 
-// --- 1.2 Concrete Observers ---
 class LoggerObserver : public Observer {
 public:
     void update(string event) override {
-        // LLR 6.2: Log mesajı bildirimi (Dosyaya yazar)
+        // Singleton Logger kullanımı
         Logger::getInstance()->log("[SECURITY - OBSERVER]: " + event);
     }
 };
@@ -33,20 +36,17 @@ public:
 class AlarmObserver : public Observer {
 public:
     void update(string event) override {
-        // LLR 6.2: Alarm bildirimi
-        cout << "[ALARM UNIT]: Sensor tetiklendi! Alarm calisiyor -> " << event << endl;
+        cout << "[ALARM UNIT]: DIT! DIT! DIT! Sensor tetiklendi -> " << event << endl;
     }
 };
 
 class SMSObserver : public Observer {
 public:
     void update(string event) override {
-        // LLR 6.2: SMS bildirimi
-        cout << "[SMS SERVICE]: Kullaniciya uyari mesaji gonderildi -> " << event << endl;
+        cout << "[SMS SERVICE]: Sayin Kullanici, evinizde " << event << " tespit edildi!" << endl;
     }
 };
 
-// --- 1.3 Subject Base Class ---
 class Subject {
 private:
     vector<Observer*> observers;
@@ -55,7 +55,7 @@ public:
         observers.push_back(o);
     }
     void notify(string event) {
-        cout << "\n--- [SENSOR] Durum Algilandi: " << event << " ---" << endl;
+        cout << "\n--- [SENSOR] ALGILAMA YAPILDI: " << event << " ---" << endl;
         for (Observer* o : observers) {
             o->update(event);
         }
@@ -64,177 +64,153 @@ public:
     virtual ~Subject() = default;
 };
 
-// --- 1.4 Concrete Subjects (Sensorler - Device Entegreli) ---
+// =============================================================
+//  BOLUM 2: DEVICE ENTEGRASYONU (Sensörler)
+// =============================================================
 
-// KAMERA SINIFI: Hem bir Cihaz (Device) hem de bir Gözlemlenen (Subject)
+// CAMERA: Hem Device (Zehra) hem Subject (Sen)
 class Camera : public Device, public Subject {
 public:
-    // Yapıcı metod: İsim alır, Device sınıfına iletir.
     Camera(string name = "Guvenlik Kamerasi") : Device(name) {}
 
-    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
+    // --- Device Zorunlu Fonksiyonları ---
     void powerOn() override {
         setActive(true);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") sistemi baslatildi." << endl;
     }
 
     void powerOff() override {
         setActive(false);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") KAPATILDI." << endl;
+        cout << "[DEVICE]: " << getName() << " kapatildi." << endl;
     }
 
     void reportStatus() const override {
-        cout << "[STATUS]: " << getName() << " durumu: " << getStatus() << endl;
+        cout << "[STATUS]: " << getName() << " : " << getStatus() << endl;
     }
 
-    // Prototype Pattern (Kopyalama)
-    Device* clone() const override {
-        return new Camera(*this);
-    }
+    Device* clone() const override { return new Camera(*this); }
 
-    // --- Dev 6 (benim) Fonksiyonu ---
+    // --- Algılama Fonksiyonu ---
     void detectMotion() {
-        // Sadece cihaz aktifse (fişi takılıysa) algılar!
         if (getActiveStatus()) { 
-             notify("MOTION_DETECTED");
+             notify(EVENT_MOTION);
         } else {
-             cout << "[UYARI]: " << getName() << " kapali, hareket algilanmadi." << endl;
+             cout << "[INFO]: " << getName() << " pasif, hareket yok sayildi." << endl;
         }
     }
 };
 
-// DEDEKTÖR SINIFI: Hem bir Cihaz (Device) hem de bir Gözlemlenen (Subject)
+// DETECTOR: Hem Device (Zehra) hem Subject (Sen)
 class Detector : public Device, public Subject {
 public:
     Detector(string name = "Yangin Dedektoru") : Device(name) {}
 
-    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
     void powerOn() override {
         setActive(true);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") aktif edildi." << endl;
     }
 
     void powerOff() override {
-        setActive(false);
-        cout << "[DEVICE]: " << getName() << " KAPATILDI." << endl;
+        cout << "[UYARI]: " << getName() << " kritik cihazdir, kapatilmasi onerilmez!" << endl;
+        setActive(false); // Yine de kapatma fonksiyonu olmalı
     }
 
     void reportStatus() const override {
-        cout << "[STATUS]: " << getName() << " sensor durumu: " << getStatus() << endl;
+        cout << "[STATUS]: " << getName() << " : " << getStatus() << endl;
     }
 
-    Device* clone() const override {
-        return new Detector(*this);
-    }
-
-    // Dedektör kritiktir (Device.h'deki sanal fonksiyonu eziyoruz)
+    Device* clone() const override { return new Detector(*this); }
     bool isCritical() const override { return true; }
 
-    // --- Dev 6 (benim) Fonksiyonları ---
     void detectSmoke() {
-        if (getActiveStatus()) {
-             notify("SMOKE_DETECTED");
-        }
+        if (getActiveStatus()) notify(EVENT_SMOKE);
     }
     void detectGas() {
-        if (getActiveStatus()) {
-             notify("GAS_DETECTED");
-        }
+        if (getActiveStatus()) notify(EVENT_GAS);
     }
 };
 
 // =============================================================
-//  BOLUM 2: CHAIN OF RESPONSIBILITY & TIMER (Zincir - LLR 6.3-6.7)
+//  BOLUM 3: CHAIN OF RESPONSIBILITY (Zincir)
 // =============================================================
 
-// Forward Declaration
-class Handler;
-
-// --- 2.1 Timer Class ---
-class Timer {
-public:
-    static void schedule(Handler* h, int interval, string event);
-};
-
-// --- 2.2 Handler Interface ---
 class Handler {
 protected:
     Handler* nextHandler = nullptr;
 public:
-    void setNext(Handler* h) {
-        this->nextHandler = h;
-    }
+    void setNext(Handler* h) { this->nextHandler = h; }
     virtual void handle(string event) = 0;
     virtual ~Handler() = default;
 };
 
-// --- Timer Implementation ---
-void Timer::schedule(Handler* h, int interval, string event) {
-    if (h != nullptr) {
-        cout << "   ... (Zamanlayici isliyor: " << interval << "ms bekleyiniz) ..." << endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-        h->handle(event);
-    }
-}
-
-// --- 2.3 Concrete Handlers ---
-
-// ADIM 1: Alarm
+// --- Halka 1: Alarm (Kullanıcı Tepkisi Bekler) ---
 class AlarmHandler : public Handler {
 public:
     void handle(string event) override {
-        if (event == "MOTION_DETECTED" || event == "SMOKE_DETECTED") {
-            cout << "[ZINCIR-1] AlarmHandler: YUKSEK SESLI ALARM CALIYOR!" << endl;
-            if (nextHandler != nullptr) {
-                Timer::schedule(nextHandler, 1000, event); 
-            }
-        } else if (nextHandler != nullptr) {
+        cout << "\n[ZINCIR-1] AlarmHandler: YUKSEK SESLI ALARM CALIYOR! (WIIU WIIU)" << endl;
+        
+        // Simülasyon: Kullanıcıya alarmı susturması için süre ver
+        cout << "   -> (Sistem kullanicinin alarmi susturmasini bekliyor...)" << endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        
+        cout << "   -> [SURE DOLDU]: Kullanici mudahelesi yok. Zincir devam ediyor." << endl;
+        
+        if (nextHandler != nullptr) {
             nextHandler->handle(event);
         }
     }
 };
 
-// ADIM 2: Işıklar
+// --- Halka 2: Işıklar (Yanıp Sönme Efekti - LLR 6.5) ---
 class LightHandler : public Handler {
 public:
     void handle(string event) override {
-        if (event == "MOTION_DETECTED") {
-            cout << "[ZINCIR-2] LightHandler: Tum isiklar ACILDI (Aydinlatma Saglandi)." << endl;
-        } 
-        else if (event == "SMOKE_DETECTED") {
-            cout << "[ZINCIR-2] LightHandler: Isiklar ACIL DURUM modunda YANIP SONUYOR!" << endl;
+        if (event == EVENT_MOTION || event == EVENT_SMOKE) {
+            cout << "\n[ZINCIR-2] LightHandler: Isiklar uyari moduna alindi." << endl;
+            
+            // BLINK (YANIP SÖNME) DÖNGÜSÜ
+            for(int i=0; i<3; i++) {
+                cout << "   * ISIKLAR ACILDI *" << endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(300)); 
+                cout << "   . isiklar kapandi ." << endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            }
+            cout << "   -> Isik uyarisi tamamlandi." << endl;
         }
 
         if (nextHandler != nullptr) {
-            Timer::schedule(nextHandler, 1500, event); 
-        }
-    }
-};
-
-// ADIM 3: Polis
-class PoliceHandler : public Handler {
-public:
-    void handle(string event) override {
-        if (event == "MOTION_DETECTED") {
-            cout << "[ZINCIR-3] PoliceHandler: 155 POLIS MERKEZI ARANIYOR... (Guvenlik Ihlali)" << endl;
-        } else if (nextHandler != nullptr) {
             nextHandler->handle(event);
         }
     }
 };
 
-// ADIM 4: İtfaiye
+// --- Halka 3: Polis (Sadece Hırsızlık) ---
+class PoliceHandler : public Handler {
+public:
+    void handle(string event) override {
+        if (event == EVENT_MOTION) {
+            cout << "\n[ZINCIR-3] PoliceHandler: !!! 155 POLIS MERKEZI ARANIYOR !!!" << endl;
+            cout << "   -> Konum ve olay bilgisi polise iletildi." << endl;
+        } else if (nextHandler != nullptr) {
+            // Hareket değilse bir sonrakine pasla
+            nextHandler->handle(event);
+        }
+    }
+};
+
+// --- Halka 4: İtfaiye (Sadece Yangın/Gaz) ---
 class FireDeptHandler : public Handler {
 public:
     void handle(string event) override {
-        if (event == "SMOKE_DETECTED" || event == "GAS_DETECTED") {
-            cout << "[ZINCIR-4] FireDeptHandler: 110 ITFAIYE ARANIYOR... (Yangin Tehlikesi)" << endl;
+        if (event == EVENT_SMOKE || event == EVENT_GAS) {
+            cout << "\n[ZINCIR-4] FireDeptHandler: !!! 110 ITFAIYE ARANIYOR !!!" << endl;
+            cout << "   -> Yangin ihbari yapildi." << endl;
         }
     }
 };
 
 // =============================================================
-//  BOLUM 3: SECURITY MANAGER
+//  YÖNETİCİ SINIF (SecurityManager)
 // =============================================================
 class SecurityManager {
 private:
@@ -245,98 +221,93 @@ private:
 
 public:
     SecurityManager() {
+        // Zincir Halkalarını Oluştur
         alarmHandler = new AlarmHandler();
         lightHandler = new LightHandler();
         policeHandler = new PoliceHandler();
         fireHandler = new FireDeptHandler();
 
+        // Zinciri Bağla: Alarm -> Işık -> Polis -> İtfaiye
         alarmHandler->setNext(lightHandler);
         lightHandler->setNext(policeHandler);
         policeHandler->setNext(fireHandler);
     }
 
     ~SecurityManager() {
-        delete alarmHandler;
-        delete lightHandler;
-        delete policeHandler;
-        delete fireHandler;
+        delete alarmHandler; delete lightHandler;
+        delete policeHandler; delete fireHandler;
     }
 
     void handleEvent(string event) {
         if (alarmHandler) {
+            cout << ">>> GUVENLIK PROTOKOLU BASLATILIYOR <<<" << endl;
             alarmHandler->handle(event);
         }
     }
 };
 
 // =============================================================
-//  MAIN (TEST)
+//  MAIN (TEST SENARYOSU)
 // =============================================================
 int main() {
-    cout << "========================================" << endl;
-    cout << "   MSH GUVENLIK MODULU (DEV 6) TESTI    " << endl;
-    cout << "========================================" << endl;
+    cout << "===========================================" << endl;
+    cout << "   MSH GUVENLIK MODULU      " << endl;
+    cout << "===========================================" << endl;
 
-    // 1. OBSERVER KURULUMU
+    // 1. KURULUM
     LoggerObserver* logger = new LoggerObserver();
     SMSObserver* sms = new SMSObserver();
-    AlarmObserver* alarm = new AlarmObserver(); 
-
-    // 2. CIHAZ (DEVICE) KURULUMU
-    cout << "\n>>> Cihazlar (Device) Olusturuluyor..." << endl;
-    Camera* camera = new Camera("Salon Kamerasi");
-    Detector* detector = new Detector("Duman Dedektoru");
-
-    // Cihazları açıyoruz (Device.h'den gelen özellik)
+    
+    // 2. CIHAZLAR
+    Camera* camera = new Camera("Ana Kapi Kamerasi");
+    Detector* detector = new Detector("Koridor Duman Sensoru");
+    
+    // Cihazları aç (Device Özelliği)
     camera->powerOn();
     detector->powerOn();
 
-    // 3. YONETICI KURULUMU
+    // 3. YONETICI
     SecurityManager* secManager = new SecurityManager();
 
     // 4. BAGLANTILAR
     camera->attach(logger);
-    camera->attach(sms); 
-
+    camera->attach(sms);
     detector->attach(logger);
-    detector->attach(alarm); 
-    detector->attach(sms);
+    detector->attach(sms); 
 
     // -----------------------------------------------------
-    // SENARYO 1: HAREKET ALGILANDI (HIRSIZ)
+    // SENARYO 1: HIRSIZ GİRİYOR
     // -----------------------------------------------------
-    cout << "\n\n>>> SENARYO 1 BASLIYOR: HAREKET ALGILANDI <<<" << endl;
-    camera->detectMotion();
+    cout << "\n\n*** SENARYO 1: HAREKET ALGILANDI ***" << endl;
+    // Biraz bekle (Gerçekçilik için)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
-    cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
-    secManager->handleEvent("MOTION_DETECTED");
-
-    // Bekleme simülasyonu
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    camera->detectMotion(); // Sensör tetiklenir
+    secManager->handleEvent(EVENT_MOTION); // Otomasyon başlar
 
     // -----------------------------------------------------
-    // SENARYO 2: DUMAN ALGILANDI (YANGIN)
+    // SENARYO 2: YANGIN ÇIKIYOR
     // -----------------------------------------------------
-    cout << "\n\n>>> SENARYO 2 BASLIYOR: DUMAN ALGILANDI <<<" << endl;
-    detector->detectSmoke();
+    cout << "\n\n*** SENARYO 2: DUMAN ALGILANDI ***" << endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-    cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
-    secManager->handleEvent("SMOKE_DETECTED");
+    detector->detectSmoke(); // Sensör tetiklenir
+    secManager->handleEvent(EVENT_SMOKE); // Otomasyon başlar
 
     // -----------------------------------------------------
-    // KAPANIŞ VE TEMİZLİK
+    // KAPANIŞ
     // -----------------------------------------------------
     cout << "\n\n>>> Sistem Kapatiliyor..." << endl;
     camera->powerOff();
     detector->powerOff();
 
-    delete logger; delete sms; delete alarm;
+    delete logger; delete sms;
     delete camera; delete detector;
     delete secManager;
 
-    cout << "\n========================================" << endl;
-    cout << "   TEST BASARIYLA TAMAMLANDI.           " << endl;
-    cout << "========================================" << endl;
+    cout << "\n===========================================" << endl;
+    cout << "   TEST BASARIYLA TAMAMLANDI.              " << endl;
+    cout << "===========================================" << endl;
 
     return 0;
 }

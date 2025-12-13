@@ -1,92 +1,66 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include "Observer.h"
-// YENİ: Device sınıfını dahil ettim
 #include "Device.h"
 
-using namespace std;
+// Sabitler
+const std::string EVENT_MOTION = "MOTION_DETECTED";
+const std::string EVENT_SMOKE = "SMOKE_DETECTED";
+const std::string EVENT_GAS = "GAS_DETECTED";
 
-// ---------------------------------------------------------
-//  CAMERA SINIFI (Hem Device hem Subject)
-// ---------------------------------------------------------
 class Camera : public Device, public Subject {
 public:
-    // Device sınıfı "isim" istiyor, biz de kurucuda (constructor) bunu istiyoruz
-    // Varsayılan olarak "Guvenlik Kamerasi" ismini verdik.
-    Camera(string deviceName = "Guvenlik Kamerasi") : Device(deviceName) {}
+    Camera(std::string name = "Guvenlik Kamerasi") : Device(name) {}
 
-    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
     void powerOn() override {
         setActive(true);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+        std::cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") sistemi baslatildi." << std::endl;
     }
 
     void powerOff() override {
         setActive(false);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") KAPATILDI." << endl;
+        std::cout << "[DEVICE]: " << getName() << " kapatildi." << std::endl;
     }
 
     void reportStatus() const override {
-        cout << "[STATUS]: " << getName() << " durumu: " << getStatus() << endl;
+        std::cout << "[STATUS]: " << getName() << " : " << getStatus() << std::endl;
     }
 
-    // Prototype Pattern (Kopyalama için gerekli)
-    Device* clone() const override {
-        return new Camera(*this);
-    }
+    Device* clone() const override { return new Camera(*this); }
 
-    // --- Dev 6 (Senin) Fonksiyonun ---
     void detectMotion() {
-        // ARTIK AKILLI: Sadece cihaz aktifse (fişi takılıysa) algılar!
-        if (getActiveStatus()) {
-            notify("MOTION_DETECTED");
-        } else {
-            cout << "[UYARI]: " << getName() << " kapali oldugu icin hareket algilanamadi." << endl;
+        if (getActiveStatus()) { 
+             notify(EVENT_MOTION);
         }
     }
 };
 
-// ---------------------------------------------------------
-//  DETECTOR SINIFI (Hem Device hem Subject)
-// ---------------------------------------------------------
 class Detector : public Device, public Subject {
 public:
-    // Varsayılan isim: "Yangin Dedektoru"
-    Detector(string deviceName = "Yangin Dedektoru") : Device(deviceName) {}
+    Detector(std::string name = "Yangin Dedektoru") : Device(name) {}
 
-    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
     void powerOn() override {
         setActive(true);
-        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+        std::cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") aktif edildi." << std::endl;
     }
 
     void powerOff() override {
-        // Dedektörler kritik cihazdır, normalde kapanmaz ama fonksiyonu yazmak zorundayız.
+        std::cout << "[UYARI]: " << getName() << " kritik cihazdir, kapatilmasi onerilmez!" << std::endl;
         setActive(false);
-        cout << "[DEVICE]: " << getName() << " KAPATILDI." << endl;
     }
 
     void reportStatus() const override {
-        cout << "[STATUS]: " << getName() << " sensor durumu: " << getStatus() << endl;
+        std::cout << "[STATUS]: " << getName() << " : " << getStatus() << std::endl;
     }
 
-    Device* clone() const override {
-        return new Detector(*this);
-    }
-    
-    // Dedektör kritiktir (Device.h'deki sanal fonksiyonu eziyoruz)
+    Device* clone() const override { return new Detector(*this); }
     bool isCritical() const override { return true; }
 
-    // --- Dev 6 (Senin) Fonksiyonların ---
     void detectSmoke() {
-        if (getActiveStatus()) {
-            notify("SMOKE_DETECTED");
-        }
+        if (getActiveStatus()) notify(EVENT_SMOKE);
     }
-
     void detectGas() {
-        if (getActiveStatus()) {
-            notify("GAS_DETECTED");
-        }
+        if (getActiveStatus()) notify(EVENT_GAS);
     }
 };
