@@ -31,7 +31,7 @@ private:
     ModeType currentMode;
     ModeConfig currentConfig;
 
-    IModeBuilder* externalBuilder{nullptr}; // setBuilder ile atanırsa
+    IModeBuilder* externalBuilder{nullptr}; 
 
     std::unique_ptr<IModeBuilder> createBuilder(ModeType mode) const;
     void applyConfig(const ModeConfig& config);
