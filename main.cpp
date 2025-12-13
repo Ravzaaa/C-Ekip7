@@ -5,7 +5,7 @@
 #include <memory>    
 #include <cstdlib> // system("cls") komutu için gerekli
 #include "Logger.h"
-
+#include <fstream> // Dosya okuma/yazma için þart
 	
 class Device {
 protected:
@@ -45,6 +45,14 @@ public:
 
 	//Prototype Pattern için clone metodu
 	virtual Device* clone() const = 0;
+
+	void loadId(int savedId) {
+		this->id = savedId;
+		if (savedId > idCounter) {
+			idCounter = savedId;
+		}
+	}
+
 };
 
 int Device::idCounter = 0;
@@ -316,26 +324,72 @@ public:
 		}
 		
 	} 
+	
+	void saveToFile() {
+		std::ofstream file("devices.txt"); // Dosyayý yazmak için aç
+		if (!file.is_open()) return;
+
+		// Format: ID Tip Isim
+		for (Device* d : deviceList) {
+			// Basitlik olsun diye ismini tip gibi kullanýyoruz burada
+			file << d->getId() << " " << d->getName() << "\n";
+		}
+		file.close();
+		std::cout << "[Sistem] Veriler 'devices.txt' dosyasina kaydedildi.\n";
+	}
+
+	
+	void loadFromFile() {
+		std::ifstream file("devices.txt"); // Dosyayý okumak için aç
+		if (!file.is_open()) return; // Dosya yoksa (ilk açýlýþsa) hiçbir þey yapma
+
+		int id;
+		std::string name;
+
+		// Dosyayý satýr satýr oku: ID ve Ýsim
+		while (file >> id >> name) {
+			Device* newDevice = nullptr;
+
+			// Ýsme göre doðru nesneyi oluþtur
+			if (name == "Light") newDevice = factory->createLight();
+			else if (name == "Camera") newDevice = factory->createCamera();
+			else if (name == "Detector") newDevice = factory->createDetector();
+			else if (name == "TV") newDevice = factory->createTV();
+			else if (name == "Alarm") newDevice = factory->createAlarm();
+
+			if (newDevice) {
+				newDevice->loadId(id); // ID'yi ayarla ve sayacý güncelle!
+				deviceList.push_back(newDevice);
+			}
+		}
+		file.close();
+		std::cout << "[Sistem] Eski cihazlar geri yuklendi.\n";
+	}
 
 };
 
 int main() {
 	DeviceManager manager;
 
-	//cihaz ekleme islemi
+	// 1. Program açýlýnca ESKÝLERÝ YÜKLE
+	manager.loadFromFile();
+
+	// Mevcut listeyi görelim
+	manager.listDevices();
+
+	// Kullanýcý iþlem yapsýn
 	manager.uiAddDevice();
 
-	// cihazlari listeleme
+	// Bir daha görelim
 	manager.listDevices();
 
-	// cihaz kaldirma islemi
 	manager.uiRemoveDevice();
 
-	manager.listDevices();
+	// 2. Program kapanmadan önce SON HALÝNÝ KAYDET
+	manager.saveToFile();
 
-	std::cout << "\nTest tamamlandi. Cikmak icin Enter'a basin...";
-
-	std::cin.ignore();
-	std::cin.get();
+	std::cout << "\nTest tamamlandi. Cikis yapiliyor...";
+	// ...
 	return 0;
+	
 }
