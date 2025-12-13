@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Proje Adı
-project(OdevProjesi)
+project(OdevProjesi VERSION 1.0)
 
 # C++ Sürümü
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Header dosyalarımız 'include' klasöründe, bunu tanıtıyoruz
 include_directories(include)
 
-# Programı oluşturacak dosyaları tek tek yazıyoruz.
-# Dosyalar 'src' klasöründe olduğu için başına 'src/' ekliyoruz.
-add_executable(OdevProjesi main.cpp src/MSH.cpp)
+# SİHİRLİ KISIM: src klasöründeki TÜM .cpp dosyalarını otomatik bul
+file(GLOB SOURCES "src/*.cpp")
+
+# Çalıştırılabilir dosyayı oluştur
+# (Ana main dosyamız + src içindeki tüm dosyalar)
+add_executable(OdevProjesi 
+    main.cpp 
+    ${SOURCES}
+)

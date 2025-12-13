@@ -1,7 +1,6 @@
-#include "../include/MSH.h"
+#include <iostream>
 
 int main() {
-    // Uygulamayı Singleton üzerinden başlat
-    MSH::getInstance()->initSystem();
+    std::cout << "Merhaba, Odevi Sonunda Calistirdim!" << std::endl;
     return 0;
 }
