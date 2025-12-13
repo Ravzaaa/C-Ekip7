@@ -11,4 +11,10 @@ include_directories(include)
 add_executable(OdevProjesi 
     main.cpp 
     src/Logger.cpp
+    src/Device.cpp
+    src/Light.cpp
+    src/Camera.cpp
+    src/Detector.cpp
+    src/TV.cpp
+    src/Alarm.cpp
 )

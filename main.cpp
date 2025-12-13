@@ -4,184 +4,14 @@
 #include <algorithm> 
 #include <memory>    
 #include <cstdlib> // system("cls") komutu için gerekli
-#include "Logger.h"
 #include <fstream> // Dosya okuma/yazma için þart
-	
-class Device {
-protected:
-	static int idCounter; // ID numarasýný artýrmak için
-	int id;
-	std::string name;
-	std::string status; // active-inactive
-	bool isActive;
-
-public:
-	Device(std::string n) : name(n), isActive(true), status("OFF") {
-		id = ++idCounter;
-	}
-	virtual ~Device() {}
-
-	int getId() const { return id; }
-	std::string getName() const { return name; }
-
-
-	void setActive(bool state) {
-		//dev3 tarafýndan kullanýlacak
-	}
-	
-	virtual void powerOn() {
-		//dev3 tarafýndan kullanýlacak
-	}
-
-	virtual void powerOff() {
-		//dev3 tarafýndan kullanýlacak
-	}
-
-
-	virtual void reportStatus() const {
-		std::cout << "ID: " << id << " | Name: " << name << " | Status: " << status
-			<< " | Active: " << (isActive ? "Yes" : "No") << std::endl;
-	}
-
-	//Prototype Pattern için clone metodu
-	virtual Device* clone() const = 0;
-
-	void loadId(int savedId) {
-		this->id = savedId;
-		if (savedId > idCounter) {
-			idCounter = savedId;
-		}
-	}
-
-};
-
-int Device::idCounter = 0;
-
-//Concrete Devices-Somut Cihazlar
-class Light : public Device {
-private:
-	std::string color;
-	int illumination; 
-public:
-	Light() : Device("Light"), color("White"), illumination(100) {} 
-
-	void setConfig(std::string c, int illum) { color = c; illumination = illum; }
-
-	void reportStatus() const override {
-		std::cout << "ID: " << id << " [Light] Color: " << color << ", Illumination: " << illumination << "%" << std::endl;
-	}
-
-	// Prototype Pattern
-	Device* clone() const override {
-		Light* copy = new Light(*this);
-		copy->id = ++idCounter; 
-		return copy;
-	}
-};
-
-class Camera : public Device {
-private:
-	int fps;
-	bool nightVision;
-	int resolution;
-	bool isRecording;
-public:
-	Camera() : Device("Camera"), fps(30), nightVision(false), resolution(1080), isRecording(false){} 
-
-	void setConfig(int f, bool nv, int res) { fps = f; nightVision = nv; resolution = res;  }
-
-	void setRecording(bool state) { isRecording = state; }
-	bool getRecording() const { return isRecording; }
-
-	void reportStatus() const override {
-		std::cout << "ID: " << id << " [Camera] FPS: " << fps << ", NightVision: " << (nightVision ? "Yes" : "No") << ", Resolution: " << resolution << ", Recording: " << (isRecording ? "Yes" : "No") << std::endl;
-	}
-
-	Device* clone() const override {
-		Camera* copy = new Camera(*this);
-		copy->id = ++idCounter;
-		return copy;
-	}
-};
-
-class TV : public Device {
-private:
-	std::string brand;
-	std::string model;
-	int volume;
-	int currentChannel;
-
-public:
-	TV() : Device("TV"), brand("Generic"), model("Standard"), volume(10), currentChannel(1) {} 
-
-	void setConfig(std::string b, std::string m) { brand = b; model = m; }
-	
-	void setVolume(int v) { volume = v; }
-	int getVolume() const { return volume; }
-
-	void setChannel(int ch) { currentChannel = ch; }
-	int getChannel() const { return currentChannel; }
-
-	void reportStatus() const override {
-		std::cout << "ID: " << id << " [TV] Brand: " << brand << ", Model: " << model << ", Volume: " << volume << ", Channel: " << currentChannel << std::endl;
-	}
-
-	Device* clone() const override {
-		TV* copy = new TV(*this);
-		copy->id = ++idCounter;
-		return copy;
-	}
-};
-
-
-class Detector : public Device {
-private:
-	bool smokeSensor;
-	bool gasSensor;
-public:
-	Detector() : Device("Detector"), smokeSensor(true), gasSensor(true) {} 
-
-	void reportStatus() const override {
-		std::cout << "ID: " << id << " [Detector] Smoke: " << (smokeSensor ? "ON" : "OFF")
-			<< ", Gas: " << (gasSensor ? "ON" : "OFF") << std::endl;
-	}
-
-	void powerOff() override {
-		//dev3 tarafýndan kullanýlacak
-	}
-
-	Device* clone() const override {
-		Detector* copy = new Detector(*this);
-		copy->id = ++idCounter;
-		return copy;
-	}
-};
-
-
-class Alarm : public Device {
-private:
-	bool isTriggered;
-
-public:
-	Alarm() : Device("Alarm"), isTriggered(false) {}
-
-	void setTriggered(bool state) { isTriggered = state; }
-	bool getTriggered() const { return isTriggered; }
-
-	void activate() {
-		//dev6 kullanacak
-	}
-
-	void reportStatus() const override {
-		std::cout << "ID: " << id << " [ALARM] Status: " << (isTriggered ? "TRIGGERED!" : "Silent") << std::endl;
-	}
-
-	Device* clone() const override {
-		Alarm* copy = new Alarm(*this);
-		copy->id = ++idCounter;
-		return copy;
-	}
-};
+#include "Logger.h"
+#include "Device.h"
+#include "Light.h"
+#include "Camera.h"
+#include "Detector.h"
+#include "TV.h"
+#include "Alarm.h"
 
 //abstract factory icin soyut arayuz
 class DeviceFactory {
@@ -197,11 +27,11 @@ public:
 
 class StandardDeviceFactory : public DeviceFactory {
 public:
-	Device* createLight() override { return new Light(); }
-	Device* createCamera() override { return new Camera(); }
-	Device* createDetector() override { return new Detector(); }
-	Device* createTV() override { return new TV(); }
-	Device* createAlarm() override { return new Alarm(); }
+	Device* createLight() override { return new Light("Light", "White", 100); }
+	Device* createCamera() override { return new Camera("Camera", 30, false); }
+	Device* createDetector() override { return new Detector("Detector", true, true); }
+	Device* createTV() override { return new TV("TV", "Generic", "Standard", 1, 10); }
+	Device* createAlarm() override { return new Alarm("Alarm"); }
 };
 
 
@@ -248,13 +78,20 @@ public:
 		}
 
 		if (!prototype) return;
-
-		
 		addDevice(prototype);
+		int baslangicId = prototype->getId();
 
-		// prototype pattern ile çoðaltma islemi
+		// Kalan adet kadar kopyalýyoruz
 		for (int i = 1; i < quantity; ++i) {
-			addDevice(prototype->clone());
+			// 1. Kopyasýný oluþtur (Þu an ID'si hala 10)
+			Device* kopya = prototype->clone();
+
+			// 2. ID'sini manuel olarak deðiþtiriyoruz
+			// Baþlangýç ID + Döngü Sayýsý (10+1=11, 10+2=12...)
+			kopya->setId(baslangicId + i);
+
+			// 3. Yeni ID'li kopyayý listeye ekle
+			addDevice(kopya);
 		}
 
 		std::cout << quantity << " adet cihaz eklendi.\n";
@@ -275,7 +112,9 @@ public:
 	void listDevices() {
 		std::cout << "\n--- Cihaz Listesi ---\n";
 		for (const auto& d : deviceList) {
+			std::cout << ">> [ID: " << d->getId() << "] \n";
 			d->reportStatus();
+			std::cout << "\n";
 		}
 		std::cout << "---------------------\n";
 	}
