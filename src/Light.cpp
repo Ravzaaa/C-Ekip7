@@ -26,7 +26,9 @@ void Light::powerOff() {
 }
 
 void Light::reportStatus() const {
-    std::cout << "---- LIGHT STATUS ----\n";
+    std::cout << "----------------------------\n";
+    std::cout << "        LIGHT STATUS\n";
+    std::cout << "----------------------------\n";
     std::cout << "Ad: " << name << "\n";
     std::cout << "Durum: " << (isPoweredOn ? "Açik" : "Kapali") << "\n";
     std::cout << "Renk: " << color << "\n";

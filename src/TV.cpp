@@ -49,7 +49,9 @@ void TV::setVolume(int newVolume) {
 }
 
 void TV::reportStatus() const {
-    std::cout << "---- TV STATUS ----\n";
+    std::cout << "-------------------\n";
+    std::cout << "        TV STATUS          \n";
+    std::cout << "-------------------\n";
     std::cout << "Ad: " << name << "\n";
     std::cout << "Durum: " << (isPoweredOn ? "Acik" : "Kapali") << "\n";
     std::cout << "Kanal: " << channel << "\n";

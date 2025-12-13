@@ -16,7 +16,9 @@ void Alarm::powerOff() {
 }
 
 void Alarm::reportStatus() const {
-    std::cout << "---- ALARM STATUS ----\n";
+    std::cout << "----------------------------\n";
+    std::cout << "        ALARM STATUS\n";
+    std::cout << "----------------------------\n";
     std::cout << "Ad: " << name << "\n";
     std::cout << "Durum: " << (isPoweredOn ? "CALISIYOR" : "KAPALI") << "\n";
     std::cout << "----------------------\n";

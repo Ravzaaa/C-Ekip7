@@ -58,7 +58,9 @@ void Camera::stopRecording() {
 }
 
 void Camera::reportStatus() const {
-    std::cout << "---- CAMERA STATUS ----\n";
+    std::cout << "----------------------------\n";
+    std::cout << "       CAMERA STATUS\n";
+    std::cout << "----------------------------\n";
     std::cout << "Ad: " << name << "\n";
     std::cout << "Durum: " << (isPoweredOn ? "Acik" : "Kapali") << "\n";
     std::cout << "Kayit: " << (recording ? "Var" : "Yok") << "\n";
