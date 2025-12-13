@@ -1,0 +1,4 @@
+2 Light
+3 Light
+4 Light
+5 Camera

@@ -43,3 +43,4 @@ Device::Device(const std::string& name)
         idCounter = savedId;
     }
     }
+
