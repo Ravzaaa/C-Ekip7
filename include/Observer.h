@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+// YENİ EKLENDİ: İlayda'nın Logger dosyasını dahil ettim
+#include "Logger.h"
 
 using namespace std;
 
@@ -13,12 +15,15 @@ public:
 };
 
 // --- Concrete Observers ---
-// NOT: Dev 1'den Logger gelince burayı güncelleyeceğiz.
+
 class LoggerObserver : public Observer {
 public:
     void update(string event) override {
-        cout << "[LOGGER]: Sistem kaydina eklendi: " << event << endl; 
-        // ILERIDE: Logger::getInstance()->log(event); olacak.
+
+        
+        // YENİ KOD (Dev 1 Entegrasyonu):
+        // Singleton yapısı ile log dosyasına yazma işlemi
+        Logger::getInstance()->log("[SECURITY - OBSERVER]: " + event);
     }
 };
 
