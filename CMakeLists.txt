@@ -17,4 +17,6 @@ add_executable(OdevProjesi
     src/Detector.cpp
     src/TV.cpp
     src/Alarm.cpp
+    src/DeviceManager.cpp
+    src/DeviceFactory.cpp
 )
