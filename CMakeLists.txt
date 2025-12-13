@@ -16,8 +16,7 @@ add_executable(OdevProjesi
     src/Camera.cpp
     src/TV.cpp
     src/Alarm.cpp
-    src/SmokeDetector.cpp
-    src/GasDetector.cpp 
+    src/Detector.cpp
     
 )
 

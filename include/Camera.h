@@ -6,10 +6,12 @@
 
 class Camera : public Device {
 private:
+    int fps;
+    bool nightVision;
     bool recording;
 
 public:
-    Camera(const std::string& name);
+    Camera(const std::string& name, int fps=30, bool nightVision=false);
 
     void powerOn() override;
     void powerOff() override;

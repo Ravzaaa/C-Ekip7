@@ -1,9 +1,12 @@
 #include "Camera.h"
 #include <iostream>
 
-Camera::Camera(const std::string& name)
-    : Device(name), recording(false) {}
-
+Camera::Camera(const std::string& name, int fps, bool nightVision)
+    : Device(name),
+      fps(fps),
+      nightVision(nightVision),
+      recording(false)
+{}
 
 void Camera::powerOn() {
     if(!getActiveStatus()) {
@@ -28,7 +31,6 @@ void Camera::powerOff() {
         std::cout << name << " kamerasi zaten kapali.\n";
     }
 }
-
 
 
 void Camera::startRecording() {
@@ -60,6 +62,8 @@ void Camera::reportStatus() const {
     std::cout << "Ad: " << name << "\n";
     std::cout << "Durum: " << (isPoweredOn ? "Acik" : "Kapali") << "\n";
     std::cout << "Kayit: " << (recording ? "Var" : "Yok") << "\n";
+    std::cout << "FPS: " << fps << "\n";
+    std::cout << "Night Vision: "<< (nightVision ? "Acik" : "Kapali") << "\n";
     std::cout << "------------------------\n";
 }
 

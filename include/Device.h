@@ -6,7 +6,9 @@
 class Device {
 protected:
     int id;
+    static int idCounter;
     std::string name;
+    std::string status;
     bool isPoweredOn;
     bool isActive;
 
@@ -16,8 +18,11 @@ public:
 
     int getId() const;
     void setId(int newId);
+
+    void loadId(int savedId);
     
     std::string getName() const;
+    std::string getStatus() const;
     bool getPowerStatus() const;
     bool getActiveStatus() const;
 

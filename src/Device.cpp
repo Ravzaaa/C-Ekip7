@@ -1,7 +1,11 @@
 #include "Device.h"
 
+int Device::idCounter = 0;
+
 Device::Device(const std::string& name)
-    : id(-1), name(name), isPoweredOn(false), isActive(true) {}
+    :  name(name), status("OFF"), isPoweredOn(false), isActive(true) {
+        id = ++idCounter;
+    }
 
     int Device::getId() const {
         return id;
@@ -16,6 +20,10 @@ Device::Device(const std::string& name)
         return name;
     }
 
+    std::string Device::getStatus() const {
+        return status;
+    }
+
     bool Device::getPowerStatus() const {
         return isPoweredOn;
     }
@@ -26,5 +34,13 @@ Device::Device(const std::string& name)
 
     void Device::setActive(bool state) {
         isActive = state;
+        status = state ? "ACTIVE" : "INACTIVE";
+    }
+
+    void Device::loadId(int savedId) {
+    this->id = savedId;
+    if (savedId > idCounter) {
+        idCounter = savedId;
+    }
     }
 

@@ -2,6 +2,8 @@
 #include "Light.h"
 #include "Camera.h"
 #include "TV.h"
+#include "Alarm.h"
+#include "Detector.h"
 
 
 int main() {
@@ -33,7 +35,8 @@ int main() {
     guvenlikKamerasi.powerOff();
     guvenlikKamerasi.reportStatus();
 
-    TV salonTV("Salon TV", 7, 25);
+    TV salonTV("Salon TV", "Samsung", "QLED", 7, 25);
+
 
     salonTV.powerOn();
     salonTV.setChannel(12);
@@ -41,6 +44,23 @@ int main() {
     salonTV.reportStatus();
     salonTV.powerOff();
     salonTV.reportStatus();
+
+    Alarm evAlarmi("Alarm Sistemi");
+
+    evAlarmi.powerOn();
+    evAlarmi.reportStatus();
+
+    evAlarmi.powerOff();    //  Kapatma denemesi → reddedilmeli
+    evAlarmi.reportStatus();
+
+    Detector evDedektoru("Dedektor Sistemi", true, true);
+
+    evDedektoru.powerOn();
+    evDedektoru.detectGas(true);
+    evDedektoru.detectSmoke(true);
+    evDedektoru.reportStatus();
+    evDedektoru.powerOff();   // reddedilecek
+
 
 
     return 0;

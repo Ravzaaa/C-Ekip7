@@ -8,9 +8,11 @@ class TV : public Device {
 private:
     int channel;
     int volume;
+    std::string brand;
+    std::string model;
 
 public:
-    TV(const std::string& name, int channel = 1, int volume = 10);
+    TV(const std::string& name, const std::string &brand, const std::string &model,  int channel = 1, int volume = 10);
     Device* clone() const override;
 
     void powerOn() override;
