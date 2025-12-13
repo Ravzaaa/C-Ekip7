@@ -15,7 +15,7 @@ public:
     void revertToPreviousState();
     State getCurrentState() const;
 
-    void applyRestrictions();
-    Snapshot saveSnapshot();
-    void restoreSnapshot(Snapshot s);
+    void applyRestrictions() const;
+    Snapshot saveSnapshot() const;
+    void restoreSnapshot(const Snapshot& s);
 };
