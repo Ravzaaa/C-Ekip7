@@ -4,7 +4,9 @@
 #include <thread> // Timer simulasyonu (std::this_thread)
 #include <chrono> // Zaman birimleri (std::chrono)
 
-#include "Logger.h" 
+// --- DIŞ KAYNAKLAR (Diğer Geliştiriciler) ---
+#include "Logger.h"  // Dev 1 (İlayda)
+#include "Device.h"  // Dev 3 (Zehra)
 
 using namespace std;
 
@@ -23,8 +25,7 @@ public:
 class LoggerObserver : public Observer {
 public:
     void update(string event) override {
-        // LLR 6.2: Log mesajı bildirimi
-
+        // LLR 6.2: Log mesajı bildirimi (Dosyaya yazar)
         Logger::getInstance()->log("[SECURITY - OBSERVER]: " + event);
     }
 };
@@ -63,24 +64,82 @@ public:
     virtual ~Subject() = default;
 };
 
-// --- 1.4 Concrete Subjects (Sensorler) ---
-// LLR 6.1: Kamera ve Dedektörler
-class Camera : public Subject {
+// --- 1.4 Concrete Subjects (Sensorler - Device Entegreli) ---
+
+// KAMERA SINIFI: Hem bir Cihaz (Device) hem de bir Gözlemlenen (Subject)
+class Camera : public Device, public Subject {
 public:
+    // Yapıcı metod: İsim alır, Device sınıfına iletir.
+    Camera(string name = "Guvenlik Kamerasi") : Device(name) {}
+
+    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
+    void powerOn() override {
+        setActive(true);
+        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+    }
+
+    void powerOff() override {
+        setActive(false);
+        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") KAPATILDI." << endl;
+    }
+
+    void reportStatus() const override {
+        cout << "[STATUS]: " << getName() << " durumu: " << getStatus() << endl;
+    }
+
+    // Prototype Pattern (Kopyalama)
+    Device* clone() const override {
+        return new Camera(*this);
+    }
+
+    // --- Dev 6 (benim) Fonksiyonu ---
     void detectMotion() {
-        // LLR 6.3: Hareket algılandığında tetikle
-        notify("MOTION_DETECTED");
+        // Sadece cihaz aktifse (fişi takılıysa) algılar!
+        if (getActiveStatus()) { 
+             notify("MOTION_DETECTED");
+        } else {
+             cout << "[UYARI]: " << getName() << " kapali, hareket algilanmadi." << endl;
+        }
     }
 };
 
-class Detector : public Subject {
+// DEDEKTÖR SINIFI: Hem bir Cihaz (Device) hem de bir Gözlemlenen (Subject)
+class Detector : public Device, public Subject {
 public:
+    Detector(string name = "Yangin Dedektoru") : Device(name) {}
+
+    // --- Device'dan Gelen Zorunlu Fonksiyonlar ---
+    void powerOn() override {
+        setActive(true);
+        cout << "[DEVICE]: " << getName() << " (ID: " << getId() << ") ACILDI." << endl;
+    }
+
+    void powerOff() override {
+        setActive(false);
+        cout << "[DEVICE]: " << getName() << " KAPATILDI." << endl;
+    }
+
+    void reportStatus() const override {
+        cout << "[STATUS]: " << getName() << " sensor durumu: " << getStatus() << endl;
+    }
+
+    Device* clone() const override {
+        return new Detector(*this);
+    }
+
+    // Dedektör kritiktir (Device.h'deki sanal fonksiyonu eziyoruz)
+    bool isCritical() const override { return true; }
+
+    // --- Dev 6 (benim) Fonksiyonları ---
     void detectSmoke() {
-        // LLR 6.4: Duman algılandığında tetikle
-        notify("SMOKE_DETECTED");
+        if (getActiveStatus()) {
+             notify("SMOKE_DETECTED");
+        }
     }
     void detectGas() {
-        notify("GAS_DETECTED");
+        if (getActiveStatus()) {
+             notify("GAS_DETECTED");
+        }
     }
 };
 
@@ -211,22 +270,31 @@ public:
 };
 
 // =============================================================
-//  MAIN
+//  MAIN (TEST)
 // =============================================================
 int main() {
     cout << "========================================" << endl;
     cout << "   MSH GUVENLIK MODULU (DEV 6) TESTI    " << endl;
     cout << "========================================" << endl;
 
+    // 1. OBSERVER KURULUMU
     LoggerObserver* logger = new LoggerObserver();
     SMSObserver* sms = new SMSObserver();
     AlarmObserver* alarm = new AlarmObserver(); 
 
-    Camera* camera = new Camera();
-    Detector* detector = new Detector();
+    // 2. CIHAZ (DEVICE) KURULUMU
+    cout << "\n>>> Cihazlar (Device) Olusturuluyor..." << endl;
+    Camera* camera = new Camera("Salon Kamerasi");
+    Detector* detector = new Detector("Duman Dedektoru");
 
+    // Cihazları açıyoruz (Device.h'den gelen özellik)
+    camera->powerOn();
+    detector->powerOn();
+
+    // 3. YONETICI KURULUMU
     SecurityManager* secManager = new SecurityManager();
 
+    // 4. BAGLANTILAR
     camera->attach(logger);
     camera->attach(sms); 
 
@@ -234,25 +302,39 @@ int main() {
     detector->attach(alarm); 
     detector->attach(sms);
 
+    // -----------------------------------------------------
+    // SENARYO 1: HAREKET ALGILANDI (HIRSIZ)
+    // -----------------------------------------------------
     cout << "\n\n>>> SENARYO 1 BASLIYOR: HAREKET ALGILANDI <<<" << endl;
     camera->detectMotion();
     
     cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
     secManager->handleEvent("MOTION_DETECTED");
 
+    // Bekleme simülasyonu
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
+    // -----------------------------------------------------
+    // SENARYO 2: DUMAN ALGILANDI (YANGIN)
+    // -----------------------------------------------------
     cout << "\n\n>>> SENARYO 2 BASLIYOR: DUMAN ALGILANDI <<<" << endl;
     detector->detectSmoke();
 
     cout << ">>> Otomasyon Zinciri Baslatiliyor..." << endl;
     secManager->handleEvent("SMOKE_DETECTED");
 
+    // -----------------------------------------------------
+    // KAPANIŞ VE TEMİZLİK
+    // -----------------------------------------------------
+    cout << "\n\n>>> Sistem Kapatiliyor..." << endl;
+    camera->powerOff();
+    detector->powerOff();
+
     delete logger; delete sms; delete alarm;
     delete camera; delete detector;
     delete secManager;
 
-    cout << "\n\n========================================" << endl;
+    cout << "\n========================================" << endl;
     cout << "   TEST BASARIYLA TAMAMLANDI.           " << endl;
     cout << "========================================" << endl;
 
