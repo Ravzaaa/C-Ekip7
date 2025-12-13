@@ -1,0 +1,3 @@
+/Users/ilaydakahraman/Documents/GitHub/C-Ekip7/build/CMakeFiles/OdevProjesi.dir
+/Users/ilaydakahraman/Documents/GitHub/C-Ekip7/build/CMakeFiles/edit_cache.dir
+/Users/ilaydakahraman/Documents/GitHub/C-Ekip7/build/CMakeFiles/rebuild_cache.dir

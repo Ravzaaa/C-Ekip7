@@ -1,0 +1,20 @@
+[2025-12-13 00:31:34] Sistem başlatıldı. Loglama işlemi başladı.
+[2025-12-13 00:31:34] TEST: MSH Sistemi başlatılıyor...
+[2025-12-13 00:31:34] DataManager: Sistem durumu yükleniyor.
+[2025-12-13 00:31:34] UYARI: Konfigürasyon dosyası bulunamadı. Varsayılan ayarlar kullanılıyor.
+[2025-12-13 00:31:34] TEST: Kullanıcı Modu 'Cinema' olarak değiştirdi.
+[2025-12-13 00:31:34] TEST: Kullanıcı 4 Kamera ve 1 TV ekledi.
+[2025-12-13 00:31:34] TEST: Kapanış Komutu tetikleniyor: Son durum kaydediliyor.
+[2025-12-13 00:31:34] DataManager: Sistem durumu kaydediliyor.
+[2025-12-13 00:31:34] DataManager: Durum başarıyla kaydedildi.
+[2025-12-13 00:31:34] TEST: MSH sistemi başarıyla sonlandırıldı.
+[2025-12-13 00:39:20] Sistem başlatıldı. Loglama işlemi başladı.
+[2025-12-13 00:39:20] TEST: MSH Sistemi başlatılıyor...
+[2025-12-13 00:39:20] DataManager: Sistem durumu yükleniyor.
+[2025-12-13 00:39:20] DataManager: Durum başarıyla yüklendi. Aktif Mod: Cinema
+[2025-12-13 00:39:20] TEST: Kullanıcı Modu 'Cinema' olarak değiştirdi.
+[2025-12-13 00:39:20] TEST: Kullanıcı 4 Kamera ve 1 TV ekledi.
+[2025-12-13 00:39:20] TEST: Kapanış Komutu tetikleniyor: Son durum kaydediliyor.
+[2025-12-13 00:39:20] DataManager: Sistem durumu kaydediliyor.
+[2025-12-13 00:39:20] DataManager: Durum başarıyla kaydedildi.
+[2025-12-13 00:39:20] TEST: MSH sistemi başarıyla sonlandırıldı.
