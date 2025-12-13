@@ -2,7 +2,6 @@
 #include <iostream>
 
 
-// ---- ModeDirector ----
 
 ModeDirector::ModeDirector(IDeviceController& deviceController)
     : deviceController(deviceController),
@@ -58,7 +57,7 @@ void ModeDirector::changeMode(ModeType newMode) {
     currentMode = newMode;
     currentConfig = config;
 
-    // İstersen rapor amaçlı:
+    // Rapor amaçlı:
     // currentConfig.showSettings();
 }
 

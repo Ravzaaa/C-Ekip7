@@ -1,6 +1,6 @@
 #include "ModeBuilder.h"
 
-// -------- NormalModeBuilder --------
+
 NormalModeBuilder::NormalModeBuilder() {
     reset();
 }
@@ -26,7 +26,7 @@ ModeConfig NormalModeBuilder::getResult() const {
     return config;
 }
 
-// -------- NightModeBuilder --------
+
 NightModeBuilder::NightModeBuilder() {
     reset();
 }
@@ -52,7 +52,7 @@ ModeConfig NightModeBuilder::getResult() const {
     return config;
 }
 
-// -------- PartyModeBuilder --------
+
 PartyModeBuilder::PartyModeBuilder() {
     reset();
 }
@@ -78,7 +78,7 @@ ModeConfig PartyModeBuilder::getResult() const {
     return config;
 }
 
-// -------- CinemaModeBuilder --------
+
 CinemaModeBuilder::CinemaModeBuilder() {
     reset();
 }
