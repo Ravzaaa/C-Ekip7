@@ -14,9 +14,12 @@ public:
           const std::string& color = "Beyaz",
           int brightness = 100);
 
+ 
     void powerOn() override;
     void powerOff() override;
     void reportStatus() const override;
+
+    Device* clone() const override;
 
     void setColor(const std::string& newColor);
     void setBrightness(int newBrightness);

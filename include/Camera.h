@@ -15,6 +15,8 @@ public:
     void powerOff() override;
     void reportStatus() const override;
 
+    Device* clone() const override;
+
     void startRecording();
     void stopRecording();
 };

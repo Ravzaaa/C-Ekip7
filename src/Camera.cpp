@@ -4,7 +4,13 @@
 Camera::Camera(const std::string& name)
     : Device(name), recording(false) {}
 
+
 void Camera::powerOn() {
+    if(!getActiveStatus()) {
+    std::cout << name << " kamera aktif degil.\n";
+    return;
+    }
+    
     if (!isPoweredOn) {
         isPoweredOn = true;
         std::cout << name << " kamerasi acildi.\n";
@@ -23,7 +29,13 @@ void Camera::powerOff() {
     }
 }
 
+
+
 void Camera::startRecording() {
+    if(!getActiveStatus()) {
+    std::cout << name << " kamera aktif degil.\n";
+    return;
+    }
     if (isPoweredOn && !recording) {
         recording = true;
         std::cout << name << " kayit almaya basladi.\n";
@@ -50,3 +62,7 @@ void Camera::reportStatus() const {
     std::cout << "Kayit: " << (recording ? "Var" : "Yok") << "\n";
     std::cout << "------------------------\n";
 }
+
+Device* Camera::clone() const {
+    return new Camera(*this);
+}   

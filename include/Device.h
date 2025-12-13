@@ -5,16 +5,31 @@
 
 class Device {
 protected:
+    int id;
     std::string name;
     bool isPoweredOn;
+    bool isActive;
 
 public:
     Device(const std::string& name);
-    virtual ~Device();
+    virtual ~Device()= default;
 
-    virtual void powerOn();
-    virtual void powerOff();
+    int getId() const;
+    void setId(int newId);
+    
+    std::string getName() const;
+    bool getPowerStatus() const;
+    bool getActiveStatus() const;
+
+    virtual void setActive(bool state);
+
+    virtual void powerOn() =0;
+    virtual void powerOff() =0;
     virtual void reportStatus() const = 0;
+
+    virtual bool isCritical() const { return false; }
+
+    virtual Device* clone() const = 0;
 };
 
 #endif

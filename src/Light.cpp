@@ -9,19 +9,19 @@ Light::Light(const std::string& name,
 void Light::powerOn() {
     if (!isPoweredOn) {
         isPoweredOn = true;
-        std::cout << name << " ışığı açildi. Renk: "
+        std::cout << name << " ISIK ACILDI Renk: "
                   << color << ", Parlaklik: " << brightness << "\n";
     } else {
-        std::cout << name << " ışığı zaten açik.\n";
+        std::cout << name << " ISIK ACIK DURUMDA.\n";
     }
 }
 
 void Light::powerOff() {
     if (isPoweredOn) {
         isPoweredOn = false;
-        std::cout << name << " ışığı kapatildi.\n";
+        std::cout << name << " ISIK KAPANDI.\n";
     } else {
-        std::cout << name << " ışığı zaten kapali.\n";
+        std::cout << name << " ISIK KAPALI DURUMDA.\n";
     }
 }
 
@@ -32,6 +32,10 @@ void Light::reportStatus() const {
     std::cout << "Renk: " << color << "\n";
     std::cout << "Parlaklik: " << brightness << "\n";
     std::cout << "-----------------------\n";
+}
+
+Device* Light::clone() const {
+    return new Light(*this);
 }
 
 void Light::setColor(const std::string& newColor) {

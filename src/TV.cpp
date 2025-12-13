@@ -5,6 +5,10 @@ TV::TV(const std::string& name, int channel, int volume)
     : Device(name), channel(channel), volume(volume) {}
 
 void TV::powerOn() {
+    if (!getActiveStatus()) {
+    std::cout << name << " pasif durumda, TV acilamaz.\n";
+    return;
+}
     if (!isPoweredOn) {
         isPoweredOn = true;
         std::cout << name << " televizyonu acildi.\n";
@@ -44,3 +48,8 @@ void TV::reportStatus() const {
     std::cout << "Ses: " << volume << "\n";
     std::cout << "-------------------\n";
 }
+
+Device* TV::clone() const {
+    return new TV(*this);
+}
+

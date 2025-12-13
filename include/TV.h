@@ -11,6 +11,7 @@ private:
 
 public:
     TV(const std::string& name, int channel = 1, int volume = 10);
+    Device* clone() const override;
 
     void powerOn() override;
     void powerOff() override;

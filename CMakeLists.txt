@@ -15,5 +15,19 @@ add_executable(OdevProjesi
     src/Light.cpp
     src/Camera.cpp
     src/TV.cpp
+    src/Alarm.cpp
+    src/SmokeDetector.cpp
+    src/GasDetector.cpp 
+    
 )
+
+
+# Header yolu (modern CMake stili)
+target_include_directories(OdevProjesi PUBLIC ${CMAKE_SOURCE_DIR}/include)
+if (MSVC)
+    target_compile_options(OdevProjesi PRIVATE /W4)
+else()
+    target_compile_options(OdevProjesi PRIVATE -Wall -Wextra -pedantic)
+endif()
+
 

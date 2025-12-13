@@ -1,25 +1,30 @@
 #include "Device.h"
-#include <iostream>
 
 Device::Device(const std::string& name)
-    : name(name), isPoweredOn(false) {}
+    : id(-1), name(name), isPoweredOn(false), isActive(true) {}
 
-Device::~Device() {}
-
-void Device::powerOn() {
-    if (!isPoweredOn) {
-        isPoweredOn = true;
-        std::cout << name << " cihazi açildi.\n";
-    } else {
-        std::cout << name << " cihazi zaten açik.\n";
+    int Device::getId() const {
+        return id;
     }
-}
 
-void Device::powerOff() {
-    if (isPoweredOn) {
-        isPoweredOn = false;
-        std::cout << name << " cihazi kapatildi.\n";
-    } else {
-        std::cout << name << " cihazi zaten kapali.\n";
+    void Device::setId(int newId) {
+        id = newId;
     }
-}
+
+
+    std ::string Device::getName() const {
+        return name;
+    }
+
+    bool Device::getPowerStatus() const {
+        return isPoweredOn;
+    }
+
+    bool Device::getActiveStatus() const {
+        return isActive;
+    }   
+
+    void Device::setActive(bool state) {
+        isActive = state;
+    }
+
