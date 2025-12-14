@@ -193,10 +193,50 @@ void MSH::handleInput(int choice) {
             else if(s==2) stateManager->setState(Sleep);
             break;
         }
-        case 8: // LLR 7.4
-            std::cout << "\n[KILAVUZ]\nBu sistem Singleton (MSH) tarafindan yonetilir.\n"
-                      << "Cihaz ekleyip silebilir, mod degistirebilirsiniz.\n"; 
+        case 8: {
+            std::cout << "\n=======================================================\n";
+            std::cout << "             MSH AKILLI EV SİSTEMİ KILAVUZU\n";
+            std::cout << "=======================================================\n";
+            std::cout << "Bu sistem, mimari gereksinimlere (LLR) uygun olarak, 7 gelistiricinin\n";
+            std::cout << "modullerinin Singleton deseni (LLR 7.1) ile birlestirilmesiyle calismaktadir.\n";
+            std::cout << "-------------------------------------------------------\n\n"; // Ekstra boş satır
+            
+            std::cout << "1. Sistem Durumu (Dev 4 - Memento):\n";
+            std::cout << "   - Mevcut sistemin calisma durumunu (Normal, Sleep, Performans) ve bu duruma ait\n";
+            std::cout << "     kisitlamalari raporlar (LLR 4.5).\n\n"; // Ekstra boş satır
+
+            std::cout << "2. Cihaz Ekle (Dev 2 - Prototype/Abstract Factory):\n";
+            std::cout << "   - Yeni cihaz tipini ve adedini sorar. Abstract Factory ile prototip olusturulur,\n";
+            std::cout << "     Prototype deseni (clone) ile ayni tipteki cihazlar kopyalanir (LLR 2.4).\n";
+            std::cout << "   - ID atamasi sistem tarafindan otomatik yapilir.\n\n"; // Ekstra boş satır
+
+            std::cout << "3. Cihaz Kaldir (Dev 2 - Cihaz Yonetimi):\n";
+            std::cout << "   - Mevcut cihaz listesini goruntuler ve kullanicidan silinecek cihazin ID'sini ister (LLR 2.5).\n\n"; // Ekstra boş satır
+
+            std::cout << "4. Mod Secimi (Dev 5 - Builder Pattern):\n";
+            std::cout << "   - Partymode, Cinemamode veya Eveningmode gibi 4 ana moddan birini aktif eder (LLR 5.1).\n";
+            std::cout << "   - Modu olusturmak icin Builder deseni kullanilir (LLR 5.2-5.4).\n";
+            std::cout << "   - Guvenlik cihazlari mod degisikliginden etkilenmez, her zaman acik kalir (LLR 5.5).\n\n"; // Ekstra boş satır
+            
+            std::cout << "5. Guvenlik Testi (Dev 6 - Chain of Responsibility/Observer):\n";
+            std::cout << "   - Hareket (MOTION_DETECTED) veya Duman (SMOKE_DETECTED) gibi olaylari simule eder.\n";
+            std::cout << "   - Olay, Chain of Responsibility deseni (Alarm -> Isik -> Polis/Itfaiye) uzerinden islenir (LLR 6.3, 6.4).\n\n"; // Ekstra boş satır
+
+            std::cout << "6. Cihaz Listesi (Dev 2/3):\n";
+            std::cout << "   - Sisteme ekli tum cihazlarin ID, Isim ve Durum (reportStatus) bilgilerini gosterir (LLR 3.5).\n\n"; // Ekstra boş satır
+
+            std::cout << "7. Sistem Durumu Degistir (Dev 4 - State Yonetimi):\n";
+            std::cout << "   - Sistemi Normal, Yuksek Performans veya Uyku durumlarindan birine alir (LLR 4.1).\n";
+            std::cout << "   - Durum degisimi oncesinde Memento deseni ile anlik durum kaydedilir (LLR 4.2).\n\n"; // Ekstra boş satır
+
+            std::cout << "9. Geri Al (Dev 4 - Memento Pattern):\n";
+            std::cout << "   - Sistemin bir onceki calisma durumuna (State) geri donulmesini saglar (LLR 4.3).\n\n"; // Ekstra boş satır
+
+            std::cout << "10. CIKIS ve KAYDET (Dev 1/7 - DataManager):\n";
+            std::cout << "   - Sistemi kapatir. Kapatmadan once DataManager (LLR 1.3) ile son durumu (Aktif Mod, Cihaz Sayisi) ve Cihaz Listesini kaydeder (LLR 7.5).\n";
+            std::cout << "=======================================================\n";
             break; 
+        }
         case 9:
             // Dev 4: Geri Al (Memento)
             std::cout << "Eski duruma donuluyor...\n";

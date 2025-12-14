@@ -3,5 +3,4 @@
 4 Light
 5 Camera
 6 Light
-7 Light
 8 Light
