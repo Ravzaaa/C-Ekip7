@@ -12,13 +12,4 @@ project(OdevProjesi)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# .h dosyaları include/ içinde
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
-# main + src içindeki tüm .cpp dosyaları
-add_executable(OdevProjesi
-    main.cpp
-    src/MSH.cpp
-    src/HistoryStack.cpp
-    src/Snapshot.cpp
-)
+add_executable(OdevProjesi main.cpp)

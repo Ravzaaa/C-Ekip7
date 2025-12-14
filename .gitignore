@@ -1,4 +1,30 @@
+# =========================
+# Build outputs
+# =========================
 build/
+*/build/
+
 *.exe
-*.o
-CMakeCache.txt
+*.obj
+*.pdb
+*.ilk
+*.log
+*.tlog
+*.bin
+
+# Visual Studio / MSVC
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# =========================
+# VS / CMake configs
+# =========================
+.vs/
+.vscode/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
