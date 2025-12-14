@@ -1,24 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(OdevProjesi)
-
-cmake_minimum_required(VERSION 3.10)
+project(OdevProjesi VERSION 1.0)
 
 
 project(OdevProjesi)
 
 # C++ Sürümü
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-include_directories(include)
-
-# include klasörünü tanıttık
-include_directories(include)
-
-# DERLENECEK TÜM KAYNAK DOSYALARI
-add_executable(OdevProjesi
-    main.cpp
-    src/Logger.cpp
-    src/DataManager.cpp
-)
+add_executable(OdevProjesi main.cpp)
