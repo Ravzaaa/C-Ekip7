@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include "DataManager.h"
-#include "Logger.h"
 
 // --- DUMMY SINIFLAR (Test İçin Gerekli) ---
 // Diğer arkadaşların henüz kodlarını yazmadığı için,
