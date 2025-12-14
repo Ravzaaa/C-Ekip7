@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include "DataManager.h"
+#include "Logger.h"
 
 // --- DUMMY SINIFLAR (Test İçin Gerekli) ---
 // Diğer arkadaşların henüz kodlarını yazmadığı için,
@@ -10,7 +12,6 @@
 class StateManager { public: void setState(int s){} void revertToPreviousState(){} };
 class ModeManager { public: void setMode(int m){} };
 class DeviceManager { public: void addDevice(){} void removeDevice(int id){} void listDevices(){} };
-class DataManager { public: void saveState(){} void loadState(){} };
 class SecurityManager { public: void enableSecurity(){} void disableSecurity(){} };
 
 // --- SENİN GÖREVİN: Singleton MSH Sınıfı ---
