@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>  //dosya okuma/yazma icin gerekli
-#include <cstdlib> // system("cls") komutu için gerekli
+#include <cstdlib> // system("cls") komutu iï¿½in gerekli
 
 DeviceManager::DeviceManager() {
     factory = new StandardDeviceFactory();
@@ -52,7 +52,7 @@ void DeviceManager::uiAddDevice() {
     for (int i = 1; i < quantity; ++i) {
         Device* kopya = prototype->clone();
         kopya->setId(baslangicId + i);
-        addDevice(kopya);  // yeni ID'li kopyayý listeye ekleme
+        addDevice(kopya);  // yeni ID'li kopyayï¿½ listeye ekleme
     }
 
     std::cout << quantity << " adet cihaz eklendi.\n";
@@ -118,7 +118,7 @@ void DeviceManager::removeDevice(int id) {
 }
 
 void DeviceManager::saveToFile() {
-    std::ofstream file("devices.txt");  //dosyayi yazmak icin acma islemi
+    std::ofstream file("../devices.txt");  //dosyayi yazmak icin acma islemi
     if (!file.is_open()) return;
 
     for (Device* d : deviceList) {
@@ -129,7 +129,7 @@ void DeviceManager::saveToFile() {
 }
 
 void DeviceManager::loadFromFile() {
-    std::ifstream file("devices.txt");  //dosyayi okumak icin acma islemi
+    std::ifstream file("../devices.txt");  //dosyayi okumak icin acma islemi
     if (!file.is_open()) return;
 
     int id;

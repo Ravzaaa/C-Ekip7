@@ -3,43 +3,49 @@
 
 #include <iostream>
 #include <string>
-#include "DataManager.h"
+#include <memory> // unique_ptr icin gerekebilir
 
-// --- DUMMY SINIFLAR (Test İçin Gerekli) ---
-// Diğer arkadaşların henüz kodlarını yazmadığı için,
-// senin kodun hata vermesin diye bu boş kutuları kullanıyoruz.
-class StateManager { public: void setState(int s){} void revertToPreviousState(){} };
-class ModeManager { public: void setMode(int m){} };
-class DeviceManager { public: void addDevice(){} void removeDevice(int id){} void listDevices(){} };
-class SecurityManager { public: void enableSecurity(){} void disableSecurity(){} };
+// --- DİĞER GELİŞTİRİCİLERİN DOSYALARI (Include Ediyoruz) ---
+#include "DataManager.h"      // Dev 1
+#include "DeviceManager.h"    // Dev 2
+// Not: Dev 3 (Device hiyerarşisi) zaten DeviceManager icinde var.
+#include "ModeManager.h"      // Dev 4 (State / Memento - Durum Yönetimi)
+#include "ModeDirector.h"     // Dev 5 (Builder - Mod Yönetimi)
+#include "SecurityManager.h"  // Dev 6 (Observer / Chain - Güvenlik)
+#include "IDeviceController.h" // Dev 5 entegrasyonu için arayüz
 
-// --- SENİN GÖREVİN: Singleton MSH Sınıfı ---
+// --- Geliştirici 7: Entegrasyon ve Menü Arayüzü ---
+// LLR 7.1: Singleton Pattern
 class MSH {
 private:
-    static MSH* instance; // Tekil nesne
+    static MSH* instance;
 
-    // Alt yöneticiler
-    StateManager* stateManager;
-    ModeManager* modeManager;
-    DeviceManager* deviceManager;
-    DataManager* dataManager;
-    SecurityManager* securityManager;
+    // Alt Yöneticiler (Pointer olarak tutuyoruz)
+    DataManager* dataManager;         // Dev 1
+    DeviceManager* deviceManager;     // Dev 2
+    ModeManager* stateManager;        // Dev 4 (İsmi ModeManager ama State yönetiyor)
+    ModeDirector* modeDirector;       // Dev 5 (Builder yapısı)
+    SecurityManager* securityManager; // Dev 6
 
-    // Private Constructor (Dışarıdan nesne oluşturulamaz)
+    // Dev 5'in Modları cihazlara uygulayabilmesi için bir ara katman
+    IDeviceController* deviceControllerBridge; 
+
+    // Private Constructor
     MSH();
 
 public:
-    // Global erişim noktası
+    // Global Erişim (LLR 7.1)
     static MSH* getInstance();
 
-    // Sistemi başlatan fonksiyon
+    // Sistemi Başlatma (LLR 7.6)
     void initSystem();
 
-    // Menüyü gösteren fonksiyon
+    // Menü İşlemleri (LLR 7.2)
     void showMenu();
+    void handleInput(int choice); // LLR 7.3
 
-    // Kullanıcı seçimini işleyen fonksiyon
-    void handleInput(int choice);
+    // Yardımcı Entegrasyon Fonksiyonları
+    DeviceManager* getDeviceManager() const { return deviceManager; }
 };
 
 #endif // MSH_H
