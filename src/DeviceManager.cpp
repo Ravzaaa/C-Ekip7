@@ -127,6 +127,65 @@ void DeviceManager::saveToFile() {
     file.close();
     std::cout << "[Sistem] Veriler 'devices.txt' dosyasina kaydedildi.\n";
 }
+// --- YENİ EKLENEN: Manuel Cihaz Açma (Menu 4) ---
+void DeviceManager::uiPowerOnDevice() {
+    clearScreen();
+    // Senaryoda önce cihaz tipi seçilmesi veya listelenmesi bekleniyor
+    // Ancak kullanıcı doğrudan ID biliyorsa tüm listeyi tarayabiliriz.
+    // PDF Senaryo Step 31: "Press 4, then press L (Light). Enter 11 for id."
+    
+    char deviceType;
+    std::cout << "\n--- Cihaz Ac (Power ON) ---\n";
+    std::cout << "Tur Seciniz [(L)ight, (D)etector, (C)amera, (T)V, (A)larm]: ";
+    std::cin >> deviceType;
+    
+    int targetId;
+    std::cout << "Cihaz ID giriniz: ";
+    std::cin >> targetId;
+
+    bool found = false;
+    for (Device* d : deviceList) {
+        if (d->getId() == targetId) {
+            // Basit tür kontrolü (İsteğe bağlı, kullanıcı yanlış ID girerse önlemek için)
+            // Ancak ID unique olduğu için direkt işlem yapabiliriz.
+            d->powerOn(); 
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "Bu ID'ye sahip cihaz bulunamadi!\n";
+    }
+}
+
+// --- YENİ EKLENEN: Manuel Cihaz Kapatma (Menu 5) ---
+void DeviceManager::uiPowerOffDevice() {
+    clearScreen();
+    // PDF Senaryo Step 28: "Press 5, then press L. Enter 2 for id."
+    
+    char deviceType;
+    std::cout << "\n--- Cihaz Kapat (Power OFF) ---\n";
+    std::cout << "Tur Seciniz [(L)ight, (D)etector, (C)amera, (T)V, (A)larm]: ";
+    std::cin >> deviceType;
+
+    int targetId;
+    std::cout << "Cihaz ID giriniz: ";
+    std::cin >> targetId;
+
+    bool found = false;
+    for (Device* d : deviceList) {
+        if (d->getId() == targetId) {
+            d->powerOff(); // Kritik cihazsa (Alarm/Dedektör) kendi içinde reddedecektir.
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "Bu ID'ye sahip cihaz bulunamadi!\n";
+    }
+}
 
 void DeviceManager::loadFromFile() {
     std::ifstream file("../devices.txt");  //dosyayi okumak icin acma islemi

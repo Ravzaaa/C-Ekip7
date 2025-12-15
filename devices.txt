@@ -4,3 +4,6 @@
 5 Camera
 6 Light
 8 Light
+9 TV
+10 Alarm
+11 Alarm

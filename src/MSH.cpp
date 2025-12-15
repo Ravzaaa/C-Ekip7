@@ -131,117 +131,153 @@ void MSH::initSystem() {
 }
 
 void MSH::showMenu() {
-    std::cout << "\n--- ANA MENU ---" << std::endl;
-    std::cout << "1. Sistem Durumu (State Info)" << std::endl;
-    std::cout << "2. Cihaz Ekle" << std::endl;
-    std::cout << "3. Cihaz Kaldir" << std::endl;
-    std::cout << "4. Mod Secimi (Builder: Party, Cinema, Night)" << std::endl;
-    std::cout << "5. Guvenlik Testi (Simulasyon)" << std::endl;
-    std::cout << "6. Cihaz Listesi" << std::endl;
-    std::cout << "7. Sistem Durumu Degistir (State: Sleep, Performance)" << std::endl;
-    std::cout << "8. YARDIM / KILAVUZ" << std::endl;
-    std::cout << "9. Geri Al (State - Undo)" << std::endl;
-    std::cout << "10. CIKIS ve KAYDET" << std::endl;
-    std::cout << "----------------" << std::endl;
+    std::cout << "\n--- MY SWEET HOME (MSH) ANA MENU ---" << std::endl;
+    std::cout << "[1] Get Home Status (Durum Goster)" << std::endl;
+    std::cout << "[2] Add Device (Cihaz Ekle)" << std::endl;
+    std::cout << "[3] Remove Device (Cihaz Kaldir)" << std::endl;
+    std::cout << "[4] Power ON Device (Cihaz Ac - Manuel)" << std::endl; // YENİ
+    std::cout << "[5] Power OFF Device (Cihaz Kapat - Manuel)" << std::endl; // YENİ
+    std::cout << "[6] Change Mode (Mod Degistir)" << std::endl;
+    std::cout << "[7] Change State (Durum Degistir / Undo)" << std::endl;
+    std::cout << "[8] Manual (Kullanim Kilavuzu)" << std::endl;
+    std::cout << "[9] About (Hakkinda)" << std::endl;
+    std::cout << "[10] Shutdown (Kapat)" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    // Not: Güvenlik Testi (Senaryo 25-27) için gizli seçenek: 11
 }
 
+// Girdi İşleme
 void MSH::handleInput(int choice) {
     switch (choice) {
         case 1: 
-            // Dev 4: State bilgilerini yazdır
-            stateManager->applyRestrictions(); 
+            // PDF Step 4, 12, 16...
+            stateManager->applyRestrictions(); // Durum ve kısıtlar
+            deviceManager->listDevices();      // Cihaz listesi
             break;
         case 2: 
-            // Dev 2: Cihaz ekleme UI
+            // PDF Step 5, 8, 9, 10
             deviceManager->uiAddDevice(); 
             break;
         case 3: 
-            // Dev 2: Cihaz silme UI
+            // PDF Step 13, 15
             deviceManager->uiRemoveDevice(); 
             break;
-        case 4: {
-            // Dev 5: Builder Mod Seçimi
-            int m;
-            std::cout << "Mod Seciniz (1:Normal, 2:Night, 3:Party, 4:Cinema): ";
+        case 4: 
+            // PDF Step 31: Power On Device
+            deviceManager->uiPowerOnDevice();
+            break;
+        case 5: 
+            // PDF Step 28: Power Off Device
+            deviceManager->uiPowerOffDevice();
+            break;
+        case 6: {
+            // PDF Step 17, 19: Change Mode (Harf/Sayı Girdisine Uyumlu)
+            char m;
+            std::cout << "Mod Seciniz [(N)ormal, (E)vening, (P)arty, (C)inema]: ";
+            
+            // Harfli girdiyi alıyoruz
             std::cin >> m;
-            if (m == 1) modeDirector->changeMode(ModeType::Normal);
-            else if (m == 2) modeDirector->constructEveningMode();
-            else if (m == 3) modeDirector->constructPartyMode();
-            else if (m == 4) modeDirector->constructCinemaMode();
-            else std::cout << "Gecersiz Mod.\n";
+            
+            // Büyük/küçük harf kontrolü yapıyoruz
+            if (m == 'N' || m == 'n') {
+                modeDirector->changeMode(ModeType::Normal);
+            }
+            else if (m == 'E' || m == 'e') {
+                modeDirector->constructEveningMode();
+            }
+            else if (m == 'P' || m == 'p') {
+                modeDirector->constructPartyMode();
+            }
+            else if (m == 'C' || m == 'c') {
+                modeDirector->constructCinemaMode();
+            }
+            else {
+                std::cout << "Gecersiz Mod secimi. Lutfen N, E, P veya C giriniz.\n";
+            }
             break;
         }
-        case 5: {
-            // Dev 6: Güvenlik Testi
-            std::string incident;
-            std::cout << "Simule edilecek olay (MOTION_DETECTED, SMOKE_DETECTED): ";
-            std::cin >> incident;
-            securityManager->handleEvent(incident);
-            break;
-        }
-        case 6: 
-            // Dev 2: Listeleme
-            deviceManager->listDevices(); 
-            break;
         case 7: {
-            // Dev 4: State Değişimi
-            int s;
-            std::cout << "Durum Sec (0:Normal, 1:Performance, 2:Sleep): ";
+            // PDF Step 21, 23: Change State & Previous One
+            char s;
+            std::cout << "Durum Sec [(N)ormal, (H)igh Performance, (S)leep, (P)revious]: ";
             std::cin >> s;
-            if(s==0) stateManager->setState(Normal);
-            else if(s==1) stateManager->setState(HighPerformance);
-            else if(s==2) stateManager->setState(Sleep);
+            if (s == 'N' || s == 'n') stateManager->setState(Normal);
+            else if (s == 'H' || s == 'h') stateManager->setState(HighPerformance);
+            else if (s == 'S' || s == 's') stateManager->setState(Sleep);
+            else if (s == 'P' || s == 'p') {
+                std::cout << "Onceki duruma donuluyor...\n";
+                stateManager->revertToPreviousState();
+            }
+            else std::cout << "Gecersiz Durum.\n";
             break;
         }
-        case 8: {
+        case 8: { // KULLANIM KILAVUZU (MANUAL)
             std::cout << "\n=======================================================\n";
             std::cout << "             MSH AKILLI EV SİSTEMİ KILAVUZU\n";
             std::cout << "=======================================================\n";
             std::cout << "Bu sistem, mimari gereksinimlere (LLR) uygun olarak, 7 gelistiricinin\n";
             std::cout << "modullerinin Singleton deseni (LLR 7.1) ile birlestirilmesiyle calismaktadir.\n";
-            std::cout << "-------------------------------------------------------\n\n"; // Ekstra boş satır
-            
+            std::cout << "-------------------------------------------------------\n\n";
+
             std::cout << "1. Sistem Durumu (Dev 4 - Memento):\n";
-            std::cout << "   - Mevcut sistemin calisma durumunu (Normal, Sleep, Performans) ve bu duruma ait\n";
-            std::cout << "     kisitlamalari raporlar (LLR 4.5).\n\n"; // Ekstra boş satır
+            std::cout << "   - Mevcut sistemin calisma durumunu ve kisitlamalari raporlar (LLR 4.5).\n\n";
 
             std::cout << "2. Cihaz Ekle (Dev 2 - Prototype/Abstract Factory):\n";
-            std::cout << "   - Yeni cihaz tipini ve adedini sorar. Abstract Factory ile prototip olusturulur,\n";
-            std::cout << "     Prototype deseni (clone) ile ayni tipteki cihazlar kopyalanir (LLR 2.4).\n";
-            std::cout << "   - ID atamasi sistem tarafindan otomatik yapilir.\n\n"; // Ekstra boş satır
+            std::cout << "   - Yeni cihaz tipini ve adedini sorar. Prototype deseni (clone) ile\n";
+            std::cout << "     ayni tipteki cihazlar kopyalanir (LLR 2.4).\n\n";
 
             std::cout << "3. Cihaz Kaldir (Dev 2 - Cihaz Yonetimi):\n";
-            std::cout << "   - Mevcut cihaz listesini goruntuler ve kullanicidan silinecek cihazin ID'sini ister (LLR 2.5).\n\n"; // Ekstra boş satır
+            std::cout << "   - Silinecek cihazin ID'si istenerek kaldirilir (LLR 2.5).\n\n";
 
-            std::cout << "4. Mod Secimi (Dev 5 - Builder Pattern):\n";
-            std::cout << "   - Partymode, Cinemamode veya Eveningmode gibi 4 ana moddan birini aktif eder (LLR 5.1).\n";
-            std::cout << "   - Modu olusturmak icin Builder deseni kullanilir (LLR 5.2-5.4).\n";
-            std::cout << "   - Guvenlik cihazlari mod degisikliginden etkilenmez, her zaman acik kalir (LLR 5.5).\n\n"; // Ekstra boş satır
-            
-            std::cout << "5. Guvenlik Testi (Dev 6 - Chain of Responsibility/Observer):\n";
-            std::cout << "   - Hareket (MOTION_DETECTED) veya Duman (SMOKE_DETECTED) gibi olaylari simule eder.\n";
-            std::cout << "   - Olay, Chain of Responsibility deseni (Alarm -> Isik -> Polis/Itfaiye) uzerinden islenir (LLR 6.3, 6.4).\n\n"; // Ekstra boş satır
+            std::cout << "4. & 5. Cihaz Ac/Kapat (Dev 3 - Cihaz Kontrolu):\n";
+            std::cout << "   - Secilen cihazi manuel olarak acar veya kapatir (REQ 6).\n";
+            std::cout << "   - Kritik cihazlar (Alarm/Dedektor) kapatilamaz (LLR 3.3).\n\n";
 
-            std::cout << "6. Cihaz Listesi (Dev 2/3):\n";
-            std::cout << "   - Sisteme ekli tum cihazlarin ID, Isim ve Durum (reportStatus) bilgilerini gosterir (LLR 3.5).\n\n"; // Ekstra boş satır
+            std::cout << "6. Mod Secimi (Dev 5 - Builder Pattern):\n";
+            std::cout << "   - Party, Cinema, Night modlarindan biri Builder deseniyle kurulur (LLR 5.1).\n";
+            std::cout << "   - Guvenlik cihazlari mod degisikliginden etkilenmez (LLR 5.5).\n\n";
 
             std::cout << "7. Sistem Durumu Degistir (Dev 4 - State Yonetimi):\n";
-            std::cout << "   - Sistemi Normal, Yuksek Performans veya Uyku durumlarindan birine alir (LLR 4.1).\n";
-            std::cout << "   - Durum degisimi oncesinde Memento deseni ile anlik durum kaydedilir (LLR 4.2).\n\n"; // Ekstra boş satır
+            std::cout << "   - Normal, Sleep, Performans durumlari arasinda gecis yapilir.\n";
+            std::cout << "   - 'Previous' secenegi ile Memento deseni kullanilarak Geri Alinir (LLR 4.3).\n\n";
 
-            std::cout << "9. Geri Al (Dev 4 - Memento Pattern):\n";
-            std::cout << "   - Sistemin bir onceki calisma durumuna (State) geri donulmesini saglar (LLR 4.3).\n\n"; // Ekstra boş satır
+            std::cout << "9. Hakkinda (About):\n";
+            std::cout << "   - Gelistirici ekip ve proje bilgilerini gosterir.\n\n";
 
             std::cout << "10. CIKIS ve KAYDET (Dev 1/7 - DataManager):\n";
-            std::cout << "   - Sistemi kapatir. Kapatmadan once DataManager (LLR 1.3) ile son durumu (Aktif Mod, Cihaz Sayisi) ve Cihaz Listesini kaydeder (LLR 7.5).\n";
+            std::cout << "   - Sistemi kapatir ve DataManager ile son durumu kaydeder (LLR 7.5).\n";
+            
+            std::cout << "Not: Guvenlik Simulasyonu (Dev 6) icin gizli secenek 11 kullanilabilir.\n";
             std::cout << "=======================================================\n";
             break; 
         }
-        case 9:
-            // Dev 4: Geri Al (Memento)
-            std::cout << "Eski duruma donuluyor...\n";
-            stateManager->revertToPreviousState();
-            stateManager->applyRestrictions();
+
+        case 9: { // HAKKINDA (ABOUT)
+            std::cout << "\n=======================================================\n";
+            std::cout << "                  HAKKINDA (ABOUT)\n";
+            std::cout << "=======================================================\n";
+            std::cout << "PROJE ADI: My Sweet Home (MSH) Akilli Ev Sistemi\n";
+            std::cout << "DERS     : BIL464 Design Patterns with C++\n";
+            std::cout << "DONEM    : Guz 2025\n";
+            std::cout << "-------------------------------------------------------\n";
+            std::cout << "GELISTIRICI EKIP (GRUP 7):\n\n";
+            std::cout << "Dev 1: ILAYDA KAHRAMAN      (Veri Yonetimi & Singleton)\n";
+            std::cout << "Dev 2: ELIF BETUL OZCELIK   (Cihaz Yonetimi & Prototype)\n";
+            std::cout << "Dev 3: ZEHRA NUREFSAN SAL   (Cihaz Uygulamalari & Factory)\n";
+            std::cout << "Dev 4: PELIN KESKIN         (Durum Yonetimi & Memento)\n";
+            std::cout << "Dev 5: CANAN INAL           (Mod Yonetimi & Builder)\n";
+            std::cout << "Dev 6: AZRA BAYRAM          (Guvenlik & Chain of Resp.)\n";
+            std::cout << "Dev 7: RAVZA KUSULAY        (Entegrasyon & Mediator/Facade)\n";
+            std::cout << "=======================================================\n";
+            break;
+        }
+        case 11: // Gizli Seçenek: Güvenlik Testi (Senaryoları çalıştırmak için)
+            {
+                std::string incident;
+                std::cout << "[SIMULASYON] Olay Tetikle (MOTION_DETECTED / SMOKE_DETECTED): ";
+                std::cin >> incident;
+                securityManager->handleEvent(incident);
+            }
             break;
         default: 
             std::cout << "Gecersiz secim!" << std::endl; 

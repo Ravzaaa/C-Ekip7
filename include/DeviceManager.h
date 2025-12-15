@@ -20,6 +20,8 @@ public:
     void uiAddDevice();
     void addDevice(Device* d);
     void listDevices();
+    void uiPowerOnDevice();  // Menü 4 için
+    void uiPowerOffDevice(); // Menü 5 için
 
     std::vector<Device*>& getDevices();
 
